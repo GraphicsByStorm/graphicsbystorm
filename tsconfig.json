@@ -1,5 +1,22 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "include": ["src", "astro.config.*", "svelte.config.*"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "types": ["astro/client"],
+    "baseUrl": ".",
+    "paths": {
+      "$pages/*": ["src/pages/*"],
+      "$components/*": ["src/components/*"],
+      "$compSec/*": ["src/components/sections/*"],
+      "$layouts/*": ["src/layouts/*"],
+      "$lib/*": ["src/lib/*"],
+      "$svelte/*": ["src/svelte/*"],
+      "$svelteSec/*": ["src/svelte/sections/*"],
+      "$styles/*": ["src/styles/*"],
+      "$assets/*": ["src/assets/*"],
+    },
+    "skipLibCheck": true
+  }    
 }

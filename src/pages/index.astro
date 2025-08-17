@@ -1,16 +1,53 @@
 ---
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Header from "$components/Header.astro";
 
+// Astro Files
+import AboutSection from "$compSec/AboutSection.astro";
+import ContactSection from "$compSec/ContactSection.astro";
+import FAQSection from "$compSec/FAQSection.astro";
+import HeroSection from "$compSec/HeroSection.astro";
+import ServicesSection from "$compSec/ServicesSection.astro";
+
+// Svelte Files
+import ShopSection from "$svelteSec/ShopSection.svelte";
+import WorkSection from "$svelteSec/WorkSection.svelte";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="GraphicsByStorm">
+	<Header />
+
+	<section id="hero" class="border-b border-white/10">
+		<HeroSection />
+	</section>
+
+	<section id="work" class="border-b border-white/10">
+		<h2 class="sr-only">Work</h2>
+		<WorkSection client:load />
+	</section>
+
+	<section id="about" class="border-b border-white/10">
+		<h2 class="sr-only">About</h2>
+		<AboutSection />
+	</section>
+
+	<section id="services" class="border-b border-white/10">
+		<h2 class="sr-only">Services</h2>
+		<ServicesSection />
+	</section>
+
+	<section id="faq" class="border-b border-white/10">
+		<h2 class="sr-only">FAQ</h2>
+		<FAQSection />
+	</section>
+
+	<section id="shop" class="border-b border-white/10">
+		<h2 class="sr-only">Shop</h2>
+		<ShopSection client:load />
+	</section>
+
+	<section id="contact" class="border-b border-white/10">
+		<h2 class="sr-only">Contact</h2>
+		<ContactSection />
+	</section>
+</BaseLayout>

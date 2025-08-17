@@ -1,0 +1,64 @@
+---
+const leftLinks = [
+    { href: "#hero", label: "Home" },
+    { href: "#work", label: "Work" },
+    { href: "#about", label: "About" },
+];
+const rightLinks = [
+    { href: "#services", label: "Services" },
+    { href: "#faq", label: "FAQ" },
+    { href: "#shop", label: "Shop" },
+    { href: "#contact", label: "Contact" },
+];
+---
+<header class="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60 border-b border-white/10">
+    <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Primary">
+        <div class="grid grid-cols-3 items-center h-16">
+            
+            <!-- Left links -->
+            <ul class="hidden md:flex items-center gap-6">
+                {leftLinks.map((item) => (
+                    <li>
+                        <a href={item.href} class="text-sm text-neutral-300 hover:text-white transition-colors">
+                            {item.label}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+
+            <!-- Centered Logo -->
+            <a href="#hero" class="justify-self-center inline-flex items-center gap-2">
+                <img src="/src/assets/logo.svg" alt="GraphicsByStorm" class="h-8 w-auto" />
+            </a>
+
+            <!-- Right links -->
+            <ul class="hidden md:flex items-center gap-6 justify-self-end">
+                {rightLinks.map((item) => (
+                    <li>
+                        <a href={item.href} class="text-sm text-neutral-300 hover:text-white transition-colors">
+                            {item.label}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+
+            <!-- Mobile: compact menu for wireframing no JS -->>
+            <div class="md:hidden col-span-3 flex items-center justify between">
+                <a href="#hero" class="inline-flex items-center gap-2 py-3">
+                    <img src="/src/assets/logo.svg" alt="GraphicsByStorm" class="h-7 w-auto" />
+                </a>
+                <div class="overflow-x-auto no-scrollbar">
+                    <ul class="flex items-center gap-4 pl-4">
+                        {[...leftLinks, ...rightLinks].map((item) => (
+                            <li>
+                                <a href={item.href} class="text-xs text-neutral-300 hover:text-white whitespace-nowrap">
+                                    {item.label}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
