@@ -1,0 +1,2 @@
+src/assets/sqLogo.svg filter=lfs diff=lfs merge=lfs -text
+src/assets/smLogo.svg filter=lfs diff=lfs merge=lfs -text
