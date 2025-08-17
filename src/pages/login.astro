@@ -1,0 +1,15 @@
+---
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Header from "$components/Header.astro";
+---
+<BaseLayout title="Login — GraphicsByStorm">
+  <Header />
+  <main class="max-w-md mx-auto px-4 py-12">
+    <form method="post" action="/api/auth/login" class="space-y-4">
+      <input name="email" type="email" placeholder="Email" class="w-full h-11 bg-neutral-900 border border-white/10 rounded px-3" required />
+      <input name="password" type="password" placeholder="Password" class="w-full h-11 bg-neutral-900 border border-white/10 rounded px-3" required />
+      <button class="w-full h-11 bg-white text-black rounded">Sign in</button>
+    </form>
+    <div class="mt-4 text-sm"><a class="underline" href="/register">Create an account</a></div>
+  </main>
+</BaseLayout>

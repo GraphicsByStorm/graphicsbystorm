@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "$layouts/BaseLayout.astro";
 import Header from "$components/Header.astro";
+import SectionHeader from "$components/SectionHeader.astro";
 
 // Astro Files
 import AboutSection from "$compSec/AboutSection.astro";
@@ -22,32 +23,32 @@ import WorkSection from "$svelteSec/WorkSection.svelte";
 	</section>
 
 	<section id="work" class="border-b border-white/10">
-		<h2 class="sr-only">Work</h2>
+		<SectionHeader label="Work" href="/work" />
 		<WorkSection client:load />
 	</section>
 
 	<section id="about" class="border-b border-white/10">
-		<h2 class="sr-only">About</h2>
+		<SectionHeader label="About" href="/about" />
 		<AboutSection />
 	</section>
 
 	<section id="services" class="border-b border-white/10">
-		<h2 class="sr-only">Services</h2>
+		<SectionHeader label="Services" href="/services" />
 		<ServicesSection />
 	</section>
 
 	<section id="faq" class="border-b border-white/10">
-		<h2 class="sr-only">FAQ</h2>
+		<SectionHeader label="FAQ" href="/faq" />
 		<FAQSection />
 	</section>
 
 	<section id="shop" class="border-b border-white/10">
-		<h2 class="sr-only">Shop</h2>
+		<SectionHeader label="Shop" href="/shop" />
 		<ShopSection client:load />
 	</section>
 
 	<section id="contact" class="border-b border-white/10">
-		<h2 class="sr-only">Contact</h2>
+		<SectionHeader label="Contact" href="/contact" />
 		<ContactSection />
 	</section>
 </BaseLayout>

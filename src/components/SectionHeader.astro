@@ -1,0 +1,9 @@
+---
+const { label, href } = Astro.props as { label: string; href: string };
+---
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-sm tracking-wide text-neutral-300">{label}</h2>
+    <a href={href} aria-label={`Open ${label} page`} class="inline-flex items-center gap-1 text-neutral-400 hover:text-white">
+        ^
+    </a>
+</div>

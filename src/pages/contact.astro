@@ -1,0 +1,13 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import Header from '$components/Header.astro';
+import ContactSection from '$components/sections/ContactSection.astro';
+import SectionHeader from '$components/SectionHeader.astro';
+---
+<BaseLayout title="Contact — GraphicsByStorm">
+  <Header />
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <SectionHeader label="Contact" href="/#contact" />
+    <ContactSection />
+  </main>
+</BaseLayout>

@@ -1,0 +1,13 @@
+---
+import BaseLayout from '$layouts/BaseLayout.astro';
+import Header from '$components/Header.astro';
+import AboutSection from '$components/sections/AboutSection.astro';
+import SectionHeader from '$components/SectionHeader.astro';
+---
+<BaseLayout title="About — GraphicsByStorm">
+  <Header />
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <SectionHeader label="About" href="/#about" />
+    <AboutSection />
+  </main>
+</BaseLayout>

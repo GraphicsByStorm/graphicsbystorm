@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  addresses Address[]
+  orders    Order[]
+
+  sessions Session[]
+  keys     Key[]
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  line1     String
+  line2     String?
+  city      String
+  state     String?
+  postal    String
+  country   String
+  isDefault Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String?
+  amountCents Int
+  currency    String      @default("USD")
+  status      String      @default("created") // created|paid|failed|refunded
+  processor   String // paypal|square|coinbase
+  processorId String? // order id / payment id / charge id
+  createdAt   DateTime    @default(now())
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id         String @id @default(cuid())
+  orderId    String
+  title      String
+  slug       String
+  priceCents Int
+  qty        Int    @default(1)
+  order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+/**
+ * Lucia tables
+ */
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Key {
+  id             String  @id
+  userId         String
+  hashedPassword String?
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

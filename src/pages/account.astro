@@ -1,0 +1,16 @@
+---
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Header from "$components/Header.astro";
+
+const { session, user } = Astro.locals;
+if (!session) return Astro.redirect("/login");
+---
+<BaseLayout title="Account — GraphicsByStorm">
+  <Header />
+  <main class="max-w-3xl mx-auto px-4 py-12 space-y-6">
+    <h1 class="text-xl">Welcome, {user?.name ?? user?.email}</h1>
+    <form method="post" action="/api/auth/logout">
+      <button class="underline">Sign out</button>
+    </form>
+  </main>
+</BaseLayout>

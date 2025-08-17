@@ -15,8 +15,8 @@
       "$svelte/*": ["src/svelte/*"],
       "$svelteSec/*": ["src/svelte/sections/*"],
       "$styles/*": ["src/styles/*"],
-      "$assets/*": ["src/assets/*"],
+      "$assets/*": ["src/assets/*"]
     },
     "skipLibCheck": true
-  }    
+  }
 }

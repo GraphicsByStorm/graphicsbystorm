@@ -1,22 +1,44 @@
 ---
-const faqs = [
-    { q: 'What’s your typical turnaround?', a: 'Wireframe content. Final copy TBD.' },
-    { q: 'Do you offer expedited projects?', a: 'Wireframe content. Final copy TBD.' },
-    { q: 'What files do I receive?', a: 'Wireframe content. Final copy TBD.' },
+type FAQ = { q: string; a: string; id?: string };
+
+const defaults: FAQ[] = [
+  { q: "What’s your typical turnaround?", a: "Wireframe copy. Final content TBD." },
+  { q: "Do you offer rush projects?", a: "Wireframe copy. Final content TBD." },
+  { q: "What files do I receive?", a: "Wireframe copy. Final content TBD." },
 ];
-const name = 'faq-accordion';
+
+const { faqs = defaults } = Astro.props as { faqs?: FAQ[] };
+
+// single-open group name for the radio inputs
+const groupName = "faq-accordion";
 ---
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-    {faqs.map((f, i) => (
-        <div class="group rounded-lg border border-white/10 overflow-hidden">
-            <input id={`f${i}`} class="peer hidden" type="radio" name={name} />
-            <label for={`f${i}`} class="flex items-center gap-3 px-4 py-3 cursor-pointer select-none hover:bg-white/10">
-                <span class="transition-transform peer-checked:rotate-90 group-hover:rotate-90">›</span>
-                <span class="text-neutral-200">{f.q}</span>
-            </label>
-            <div class="max-h-0 overflow-hidden transition- duration-300 peer-checked:max-h-40" max-height="">
-                <div class="px-9 pb-4 text-neutral-300">{f.a}</div>
-            </div>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3">
+  {faqs.map((f, i) => {
+    const id = f.id ?? `faq-${i}`;
+    return (
+      <div class="group rounded-lg border border-white/10 overflow-hidden">
+        <!-- radios keep only one item open at a time -->
+        <input id={id} class="peer hidden" type="radio" name={groupName} />
+        <label for={id}
+          class="flex items-center gap-3 px-4 py-3 cursor-pointer select-none hover:bg-white/5">
+          <!-- chevron -->
+          <span
+            class="inline-block transition-transform duration-200
+                   group-hover:rotate-90 peer-checked:rotate-90"
+            aria-hidden="true">›</span>
+          <span class="text-neutral-200">{f.q}</span>
+        </label>
+
+        <!-- content: expands on hover OR when checked; only “checked” persists -->
+        <div
+          class="max-h-0 overflow-hidden transition-[max-height] duration-300
+                 group-hover:max-h-40 peer-checked:max-h-40"
+          role="region" aria-labelledby={id}>
+          <div class="px-9 pb-4 text-neutral-300">
+            {f.a}
+          </div>
         </div>
-    ))}
+      </div>
+    );
+  })}
 </div>
