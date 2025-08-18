@@ -26,8 +26,8 @@ export const WORKS: WorkItem[] = [
       "Readability improvements after critique (stroke/contrast tweaks).",
       "Consistent hierarchy, alignment, and balance across assets."
     ],
-    cover: "/images/work/fritz/cover.jpg",
-    images: ["/images/work/fritz/1.jpg", "/images/work/fritz/2.jpg", "/images/work/fritz/3.jpg"]
+    cover: "/images/work/fritz/cover.png",
+    images: ["/images/work/fritz/01.png", "/images/work/fritz/02.png", "/images/work/fritz/03.png", "/images/work/fritz/04.png", "/images/work/fritz/05.png", "/images/work/fritz/06.png", "/images/work/fritz/07.png", "/images/work/fritz/08.png"]
   },
   {
     title: "Cosmic RVY Social Package",
@@ -43,8 +43,8 @@ export const WORKS: WorkItem[] = [
       "Typographic letter-spacing rebalanced after critique.",
       "Royalty-free textures and custom brushes for consistency."
     ],
-    cover: "/images/work/cosmic-rvy/cover.jpg",
-    images: ["/images/work/cosmic-rvy/1.jpg", "/images/work/cosmic-rvy/2.jpg"]
+    cover: "/images/work/cosmic-rvy/cover.png",
+    images: ["/images/work/cosmic-rvy/01.png", "/images/work/cosmic-rvy/02.png"]
   },
   {
     title: "Elite Build AK-47 Giveaway Promo",
@@ -60,8 +60,8 @@ export const WORKS: WorkItem[] = [
       "Hierarchy/positioning refined after feedback.",
       "Clean rasterization and consistent spacing for readability."
     ],
-    cover: "/images/work/elite-ak/cover.jpg",
-    images: ["/images/work/elite-ak/1.jpg", "/images/work/elite-ak/2.jpg"]
+    cover: "/images/work/elite-ak/cover.png",
+    images: ["/images/work/elite-ak/01.png"]
   },
   {
     title: "Pit Viper AWP Giveaway Promo",
@@ -77,8 +77,8 @@ export const WORKS: WorkItem[] = [
       "Title visibility prioritized from the start.",
       "300 DPI export normalized for on-screen clarity."
     ],
-    cover: "/images/work/pit-viper/cover.jpg",
-    images: ["/images/work/pit-viper/1.jpg", "/images/work/pit-viper/2.jpg"]
+    cover: "/images/work/pit-viper/cover.png",
+    images: ["/images/work/pit-viper/01.png"]
   },
   {
     title: "AWOKE.GG Branding",
@@ -94,8 +94,8 @@ export const WORKS: WorkItem[] = [
       "Energy-drink-meets-esports vibe via color psychology.",
       "Vector clarity and print-fidelity mockups."
     ],
-    cover: "/images/work/awoke/cover.jpg",
-    images: ["/images/work/awoke/1.jpg", "/images/work/awoke/2.jpg"]
+    cover: "/images/work/awoke/cover.png",
+    images: ["/images/work/awoke/01.png", "/images/work/awoke/02.png"]
   },
   {
     title: "Obsidian Tides Twitter Header",
@@ -111,8 +111,8 @@ export const WORKS: WorkItem[] = [
       "Monogram integrates O, T, and a subtle S curve.",
       "Dimensions/exports follow Twitter branding specs."
     ],
-    cover: "/images/work/obsidian/cover.jpg",
-    images: ["/images/work/obsidian/1.jpg", "/images/work/obsidian/2.jpg"]
+    cover: "/images/work/obsidian/cover.png",
+    images: ["/images/work/obsidian/01.png", "/images/work/obsidian/02.png"]
   },
   {
     title: "Client File-Format Guide",
@@ -128,8 +128,8 @@ export const WORKS: WorkItem[] = [
       "Interactive links implemented per feedback.",
       "Pixel-snapped icons; a11y-minded contrast and spacing."
     ],
-    cover: "/images/work/format-guide/cover.jpg",
-    images: ["/images/work/format-guide/1.jpg", "/images/work/format-guide/2.jpg"]
+    cover: "/images/work/format-guide/cover.png",
+    images: ["/images/work/format-guide/01.png", "/images/work/format-guide/02.png", "/images/work/format-guide/03.png", "/images/work/format-guide/04.png"]
   },
   {
     title: "Upper Crust Branding Suite",
@@ -145,8 +145,8 @@ export const WORKS: WorkItem[] = [
       "Typographic/spacing corrections after critique.",
       "Print-ready specs for letterhead, envelope, and cards."
     ],
-    cover: "/images/work/upper-crust/cover.jpg",
-    images: ["/images/work/upper-crust/1.jpg", "/images/work/upper-crust/2.jpg"]
+    cover: "/images/work/upper-crust/cover.png",
+    images: ["/images/work/upper-crust/01.png", "/images/work/upper-crust/02.png", "/images/work/upper-crust/03.png", "/images/work/upper-crust/04.png", "/images/work/upper-crust/05.png", "/images/work/upper-crust/06.png", "/images/work/upper-crust/07.png", "/images/work/upper-crust/08.png"]
   },
   {
     title: "Sopamanxx YouTube Thumbnail",
@@ -162,8 +162,8 @@ export const WORKS: WorkItem[] = [
       "Mobile legibility checked at small sizes.",
       "Layer structure organized for fast reuse."
     ],
-    cover: "/images/work/sopamanxx/cover.jpg",
-    images: ["/images/work/sopamanxx/1.jpg", "/images/work/sopamanxx/2.jpg"]
+    cover: "/images/work/sopamanxx/cover.png",
+    images: ["/images/work/sopamanxx/01.png", "/images/work/sopamanxx/02.png"]
   },
   {
     title: "Depresso Espresso Poster",
@@ -179,7 +179,7 @@ export const WORKS: WorkItem[] = [
       "Faces blend with tone for depth; whitespace optimized.",
       "Print-ready: embedded fonts/outline-safe vectors."
     ],
-    cover: "/images/work/depresso/cover.jpg",
-    images: ["/images/work/depresso/1.jpg", "/images/work/depresso/2.jpg"]
+    cover: "/images/work/depresso/cover.png",
+    images: ["/images/work/depresso/01.png"]
   }
 ];

@@ -336,3 +336,25 @@
     background-position: 0 0;
   }
 }
+
+/* --- Lightbox helpers --- */
+html.no-scroll, body.no-scroll { overflow: hidden !important; }
+
+/* --- Responsive media frames with aspect-ratio reservation --- */
+.media-frame {
+  position: relative;
+  width: 100%;
+  /* fallback ratio; will be overridden via inline --ar if known */
+  aspect-ratio: var(--ar, 16/9);
+  background: var(--surface-2, #0b0b0b);
+  border-radius: var(--radius-xl, 16px);
+  overflow: hidden;
+  display: block;
+}
+.media-frame > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* fit the containing image within reason */
+  display: block;
+  background: transparent;
+}
