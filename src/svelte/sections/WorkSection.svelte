@@ -1,26 +1,31 @@
 <script lang="ts">
-  // Svelte 5 runes
-  const categories = ["All", "Branding", "Web", "3D", "Motion"] as const;
-  let active = $state<typeof categories[number]>("All");
+  import type { WorkItem } from "$lib/data/work";
+  import { WORKS } from "$lib/data/work";
 
-  type Work = {
-    title: string;
-    slug: string;
-    cover: string;
-    blurb: string;
-    tags: string[];
-    images: string[];
-  };
+  // Available filter chips (derived from your dataset)
+  const categories = [
+    "All",
+    "Branding",
+    "Social",
+    "Promo",
+    "YouTube",
+    "Poster",
+    "Guide",
+    "Docs",
+    "Esports"
+  ] as const;
 
-  // Placeholder data — replace with your real content/images
-  let items = $state<Work[]>([
-    { title: "Awoke.gg", slug: "awoke-gg", cover: "/images/work1.jpg", blurb: "Esports brand refresh.", tags: ["Branding"], images: ["/images/work1.jpg","/images/work1b.jpg"] },
-    { title: "Motion Pack", slug: "motion-pack", cover: "/images/work2.jpg", blurb: "Promo animations.", tags: ["Motion"], images: ["/images/work2.jpg"] },
-    { title: "3D Stills", slug: "3d-stills", cover: "/images/work3.jpg", blurb: "Product renders.", tags: ["3D"], images: ["/images/work3.jpg","/images/work3b.jpg"] },
-  ]);
+  type Category = typeof categories[number];
 
+  // Source data (typed)
+  const all: WorkItem[] = WORKS;
+
+  // Active filter
+  let active = $state<Category>("All");
+
+  // Derived, filtered list
   const filtered = $derived(
-    active === "All" ? items : items.filter((i) => i.tags.includes(active as string))
+    active === "All" ? all : all.filter((i) => i.tags.includes(active as string))
   );
 
   // Modal state
@@ -28,87 +33,158 @@
   let activeIndex = $state<number | null>(null);
   let slideIndex = $state(0);
 
-  const openModal = (i: number) => { activeIndex = i; slideIndex = 0; modalOpen = true; };
-  const closeModal = () => { modalOpen = false; activeIndex = null; };
-  const next = () => { if (activeIndex === null) return; slideIndex = (slideIndex + 1) % filtered[activeIndex].images.length; };
-  const prev = () => { if (activeIndex === null) return; slideIndex = (slideIndex - 1 + filtered[activeIndex].images.length) % filtered[activeIndex].images.length; };
+  // Open/close modal
+  const openModal = (i: number) => {
+    activeIndex = i;
+    slideIndex = 0;
+    modalOpen = true;
+    // Focus the dialog wrapper once it mounts
+    queueMicrotask(() => {
+      const el = document.getElementById("work-dialog");
+      if (el) el.focus();
+    });
+  };
+  const closeModal = () => {
+    modalOpen = false;
+    activeIndex = null;
+  };
 
+  // Gallery navigation
+  const next = () => {
+    if (activeIndex === null) return;
+    const len = filtered[activeIndex].images.length;
+    if (len === 0) return;
+    slideIndex = (slideIndex + 1) % len;
+  };
+  const prev = () => {
+    if (activeIndex === null) return;
+    const len = filtered[activeIndex].images.length;
+    if (len === 0) return;
+    slideIndex = (slideIndex - 1 + len) % len;
+  };
+
+  // Global keyboard + wheel while modal open
   function onWindowKey(e: KeyboardEvent) {
     if (!modalOpen) return;
     if (e.key === "Escape") closeModal();
     if (e.key === "ArrowRight") next();
     if (e.key === "ArrowLeft") prev();
   }
-
   function onWindowWheel(e: WheelEvent) {
     if (!modalOpen) return;
     e.deltaY > 0 ? next() : prev();
   }
 
+  // Touch swipe for mobile
   let touchX = 0;
-  function onTouchStart(e: TouchEvent) { touchX = e.changedTouches[0].clientX; }
+  function onTouchStart(e: TouchEvent) {
+    touchX = e.changedTouches[0].clientX;
+  }
   function onTouchEnd(e: TouchEvent) {
     const dx = e.changedTouches[0].clientX - touchX;
-    if (dx > 30) prev(); else if (dx < -30) next();
+    if (dx > 30) prev();
+    else if (dx < -30) next();
   }
 </script>
 
+<!-- Must be top-level -->
 <svelte:window onkeydown={onWindowKey} onwheel={onWindowWheel} />
 
-<section id="work" class="section-wrap">
-  <h2 class="heading-2 mb-4">Selected work</h2>
+<section id="work" class="section torn-top torn-angle-right" style="--torn-color: var(--color-surface-950);">
+  <div class="section-inner">
+    <h2 class="heading-2 text-white mb-4">Selected work</h2>
 
-  <!-- Filter chips -->
-  <div class="flex flex-wrap gap-2 mb-6">
-    {#each categories as t}
-      <button
-        class={"chip chip-grunge " + (active === t ? "chip-active" : "")}
-        onclick={() => (active = t)}
-        aria-pressed={active === t}
-        type="button"
-      >
-        {t}
-      </button>
-    {/each}
+    <!-- Filter chips -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      {#each categories as t}
+        <button
+          type="button"
+          class={"chip " + (active === t ? "chip-active" : "")}
+          onclick={() => (active = t)}
+          aria-pressed={active === t}
+        >
+          {t}
+        </button>
+      {/each}
+    </div>
+
+    <!-- Cards (same visual style as Shop) -->
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {#each filtered as item, i}
+        <button
+          type="button"
+          class="card hover-lift block overflow-hidden text-left"
+          onclick={() => openModal(i)}
+          aria-label={`Open ${item.title} gallery`}
+        >
+          <div class="aspect-[4/3] bg-neutral-800">
+            <img src={item.cover} alt={item.title} class="size-full object-cover" />
+          </div>
+          <div class="p-3">
+            <div class="text-sm text-neutral-100">{item.title}</div>
+            <div class="text-neutral-400">{item.tags.join(" · ")}</div>
+            {#if item.blurb}
+              <p class="text-neutral-300 mt-1">{item.blurb}</p>
+            {/if}
+          </div>
+        </button>
+      {/each}
+    </div>
   </div>
 
-  <!-- Grid -->
-  <div class="grid grid-cols-12 gap-3 md:gap-4">
-    {#each filtered as item, i}
-      <button
-        type="button"
-        class="card-grunge hover-lift group relative overflow-hidden col-span-12 md:col-span-6 xl:col-span-4 tape-corner"
-        onclick={() => openModal(i)}
-      >
-        <img src={item.cover} alt="" class="size-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-        <div class="absolute bottom-3 left-3 text-sm text-neutral-200">{item.title}</div>
-      </button>
-    {/each}
-  </div>
-
-  <!-- Modal -->
+  <!-- Modal (no torn/texture classes here) -->
   {#if modalOpen && activeIndex !== null}
     <div class="fixed inset-0 z-50 grid place-items-center" role="dialog" aria-modal="true" tabindex="-1">
-      <button type="button" aria-label="Close dialog" class="absolute inset-0 bg-black/80" onclick={closeModal}></button>
-      <div class="relative z-10 w-full max-w-5xl p-4 card-grunge" ontouchstart={onTouchStart} ontouchend={onTouchEnd}>
-        <img
-          src={filtered[activeIndex].images[slideIndex]}
-          alt=""
-          class="mx-auto max-h-[70svh] object-contain rounded-lg"
-        />
-        <button class="absolute top-4 right-4 btn-muted !px-0 !py-0 size-9 rounded-full" onclick={closeModal} aria-label="Close">✕</button>
+      <!-- backdrop -->
+      <button
+        type="button"
+        class="absolute inset-0 bg-black/80"
+        onclick={closeModal}
+        aria-label="Close dialog"
+      />
+      <!-- dialog panel -->
+      <div
+        id="work-dialog"
+        class="relative z-10 w-full max-w-5xl p-4 card outline-none"
+        tabindex="-1"
+        ontouchstart={onTouchStart}
+        ontouchend={onTouchEnd}
+      >
+        {#if filtered[activeIndex].images.length > 0}
+          <img
+            src={filtered[activeIndex].images[slideIndex]}
+            alt=""
+            class="mx-auto max-h-[70svh] object-contain rounded-lg"
+          />
+        {/if}
+
+        <button
+          class="absolute top-4 right-4 btn-muted !px-0 !py-0 size-9 rounded-full"
+          onclick={closeModal}
+          aria-label="Close"
+          type="button"
+        >
+          ✕
+        </button>
 
         <div class="mt-4 flex justify-between items-center text-sm text-neutral-300">
-          <button class="btn-ghost" onclick={prev}>Prev</button>
-          <span>{slideIndex + 1} / {filtered[activeIndex].images.length}</span>
-          <button class="btn-ghost" onclick={next}>Next</button>
+          <button class="btn-ghost" onclick={prev} type="button">Prev</button>
+          <span>
+            {slideIndex + 1}
+            /
+            {filtered[activeIndex].images.length}
+          </span>
+          <button class="btn-ghost" onclick={next} type="button">Next</button>
         </div>
 
         <div class="mt-6">
-          <h3 class="heading-2">{filtered[activeIndex].title}</h3>
-          <p class="mt-2 text-neutral-300">{filtered[activeIndex].blurb}</p>
-          <a class="ink-underline mt-3 inline-block" href={`/case-study/${filtered[activeIndex].slug}`}>Read full case study →</a>
+          <h3 class="heading-2 text-white">{filtered[activeIndex].title}</h3>
+          {#if filtered[activeIndex].summary}
+            <p class="mt-2 text-neutral-200">{filtered[activeIndex].summary}</p>
+          {/if}
+          <a class="link-underline mt-3 inline-block" href={`/case-study/${filtered[activeIndex].slug}`}>
+            Read full case study →
+          </a>
         </div>
       </div>
     </div>

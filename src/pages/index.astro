@@ -2,7 +2,7 @@
 import BaseLayout from "$layouts/BaseLayout.astro";
 import Header from "$components/Header.astro";
 
-// Astro sections
+// Sections
 import HeroSection from "$compSec/HeroSection.astro";
 import AboutSection from "$compSec/AboutSection.astro";
 import ServicesSection from "$compSec/ServicesSection.astro";
@@ -16,37 +16,11 @@ import ShopSection from "$svelteSec/ShopSection.svelte";
 <BaseLayout title="GraphicsByStorm">
   <Header />
 
-  <section id="hero">
-    <HeroSection />
-  </section>
-
-  <section id="work">
-    <div class="section-wrap">
-      <h2 class="sr-only">Work</h2>
-      <WorkSection client:load />
-    </div>
-  </section>
-
-  <section id="about">
-    <AboutSection />
-  </section>
-
-  <section id="services">
-    <ServicesSection />
-  </section>
-
-  <section id="faq">
-    <FAQSection />
-  </section>
-
-  <section id="shop">
-    <div class="section-wrap">
-      <h2 class="sr-only">Shop</h2>
-      <ShopSection client:load />
-    </div>
-  </section>
-
-  <section id="contact">
-    <ContactSection />
-  </section>
+  <HeroSection />
+  <WorkSection client:load />
+  <AboutSection />
+  <ServicesSection />
+  <FAQSection />
+  <ShopSection client:load />
+  <ContactSection />
 </BaseLayout>

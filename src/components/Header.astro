@@ -18,56 +18,45 @@ const rightLinks = [
 const isHome = Astro.url.pathname === "/";
 const withBase = (hash: string) => (isHome ? hash : `/${hash}`);
 ---
-<header class="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60 border-b border-white/10 grain-overlay vignette">
-  <nav class="container-shell" aria-label="Primary">
-    <div class="grid grid-cols-3 items-center h-16">
-      <!-- Left links -->
+<header class="header-surface relative noise-overlay">
+  <nav class="header-inner" aria-label="Primary">
+    <div class="header-bar">
+      <!-- Left (desktop) -->
       <ul class="hidden md:flex items-center gap-6">
         {leftLinks.map((item) => (
-          <li>
-            <a href={withBase(item.href)} class="text-sm text-neutral-300 hover:text-white transition-colors">
-              {item.label}
-            </a>
-          </li>
+          <li><a href={withBase(item.href)} class="nav-link">{item.label}</a></li>
         ))}
       </ul>
 
-      <!-- Centered Logo -->
+      <!-- Center logo -->
       <div class="justify-self-center">
-        <LogoAsync href={withBase('#hero')} class="mt-2" />
+        <LogoAsync href={withBase('#hero')} class="h-8 w-auto mt-[2px]" />
       </div>
 
-      <!-- Right links + User Menu -->
+      <!-- Right (desktop) -->
       <div class="hidden md:flex items-center gap-4 justify-self-end">
         <ul class="flex items-center gap-6">
           {rightLinks.map((item) => (
-            <li>
-              <a href={withBase(item.href)} class="text-sm text-neutral-300 hover:text-white transition-colors">
-                {item.label}
-              </a>
-            </li>
+            <li><a href={withBase(item.href)} class="nav-link">{item.label}</a></li>
           ))}
         </ul>
         <UserMenu />
       </div>
 
-      <!-- Mobile row -->
-      <div class="md:hidden col-span-3 flex items-center justify-between">
-        <LogoAsync href={withBase('#hero')} class="py-3" />
-        <div class="flex items-center gap-3">
-          <div class="overflow-x-auto no-scrollbar">
-            <ul class="flex items-center gap-4 pl-2">
-              {[...leftLinks, ...rightLinks].map((item) => (
-                <li>
-                  <a href={withBase(item.href)} class="text-xs text-neutral-300 hover:text-white whitespace-nowrap">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <UserMenu />
+      <!-- Mobile: single-row rail + user menu -->
+      <div class="md:hidden flex items-center gap-3 justify-self-end">
+        <div class="nav-rail">
+          <ul class="flex items-center gap-3">
+            {[...leftLinks, ...rightLinks].map((item) => (
+              <li>
+                <a href={withBase(item.href)} class="text-xs text-neutral-300 hover:text-white whitespace-nowrap px-2 py-1.5 rounded">
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
+        <UserMenu />
       </div>
     </div>
   </nav>

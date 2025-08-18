@@ -1,29 +1,58 @@
 ---
 import BaseLayout from "$layouts/BaseLayout.astro";
 import Header from "$components/Header.astro";
-
-// Minimal example—swap with real CMS/content later
-const CASES = [
-  { slug: "awoke-gg", title: "Awoke.gg Case Study", summary: "Esports brand refresh with new identity and socials." }
-];
+import type { WorkItem } from "$lib/data/work";
+import { WORKS } from "$lib/data/work";
 
 const { slug } = Astro.params;
-const entry = CASES.find((c) => c.slug === slug);
-if (!entry) return Astro.redirect("/#work");
+const item = WORKS.find((w) => w.slug === slug) as WorkItem | undefined;
+if (!item) return Astro.redirect("/#work");
+
+const images: string[] = item.images;
+const highlights: string[] = item.highlights;
 ---
-<BaseLayout title={`${entry.title} — GraphicsByStorm`}>
+<BaseLayout title={`${item.title} — Case Study — GraphicsByStorm`}>
   <Header />
-  <main class="section-wrap space-y-6">
-    <h1 class="heading-2">{entry.title}</h1>
-    <p class="text-neutral-300">{entry.summary}</p>
+  <section class="section torn-top torn-angle-left" style="--torn-color: var(--color-surface-950);">
+    <div class="section-inner space-y-6">
+      <header class="grid gap-4 md:grid-cols-2 items-end">
+        <div>
+          <h1 class="heading-2 text-white">{item.title}</h1>
+          <p class="text-neutral-300 mt-1">{item.tags.join(" · ")}</p>
+        </div>
+        <div class="text-right">
+          <a href="/#work" class="link-underline">← Back to Work</a>
+        </div>
+      </header>
 
-    <article class="prose prose-invert max-w-3xl">
-      <p>
-        Replace this with your full case study content (goals, constraints, process,
-        outcomes, metrics, selects from the gallery, etc.).
-      </p>
-    </article>
+      <div class="grid gap-6 md:grid-cols-2">
+        <div class="card overflow-hidden">
+          <img src={item.cover} alt="" class="w-full h-auto object-cover" />
+        </div>
+        <article class="card p-5">
+          <p class="text-neutral-200">{item.summary}</p>
+          <div class="mt-4">
+            <h2 class="text-sm text-neutral-300 mb-2">Highlights</h2>
+            <ul class="list-disc pl-5 space-y-1 text-neutral-200">
+              {highlights.map((h: string) => <li>{h}</li>)}
+            </ul>
+          </div>
+          <div class="mt-4">
+            <h2 class="text-sm text-neutral-300 mb-2">Tools</h2>
+            <p class="text-neutral-200">{item.tools.join(", ")}</p>
+          </div>
+        </article>
+      </div>
 
-    <a class="link-underline" href="/#work">← Back to Work</a>
-  </main>
+      {images.length > 0 && (
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {images.map((src: string) => (
+            <div class="card overflow-hidden">
+              <img src={src} alt="" class="w-full h-auto object-cover" />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
 </BaseLayout>

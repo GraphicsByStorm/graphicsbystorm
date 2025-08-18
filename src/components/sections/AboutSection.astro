@@ -1,33 +1,78 @@
 ---
-import profile from '$assets/profile.jpg'; /* replace with your PNG */
+import profile from '$assets/profile.jpg';
 ---
-<section id="about" class="section-wrap">
-  <div class="grid gap-8 md:grid-cols-[minmax(220px,280px),1fr] items-start">
-    <div class="card overflow-hidden sticker tape-corner">
-      <img src={profile.src} alt="Profile" class="w-full h-auto" />
-    </div>
+<section
+  id="about"
+  class="section torn-top torn-bottom torn-angle-right"
+  style="--torn-color: var(--color-surface-950);"
+>
+  <div class="section-inner">
+    <!-- Media (fixed square) + Content (fluid) -->
+    <div class="grid gap-8 md:grid-cols-[auto,1fr] items-start">
+      <!-- Portrait (SQUARE + smaller clamp) -->
+      <figure class="mx-auto md:mx-0">
+        <div
+          class="card overflow-hidden"
+          style="--avatar-size: clamp(120px, 14vw, 200px); width: var(--avatar-size); height: var(--avatar-size);"
+        >
+          <img
+            src={profile.src}
+            alt="Profile photo"
+            class="size-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </figure>
 
-    <div class="space-y-4">
-      <h2 class="heading-2">About</h2>
-      <p class="text-neutral-300">
-        Short intro — who you help, how you do it, results.
-      </p>
+      <!-- Essentials -->
+      <div class="space-y-4">
+        <h2 class="heading-2 text-white">About</h2>
+        <p class="text-neutral-200">
+          I design high-impact brand systems, graphics, and motion for teams that move fast.
+          Focused on conversion, consistency, and speed.
+        </p>
 
-      <div class="flex flex-wrap gap-2 pt-2">
-        <span class="chip chip-grunge">Svelte</span>
-        <span class="chip chip-grunge">Astro</span>
-        <span class="chip chip-grunge">Tailwind</span>
-        <span class="chip chip-grunge">TypeScript</span>
-        <span class="chip chip-grunge">Figma</span>
-        <span class="chip chip-grunge">Blender</span>
-        <span class="chip chip-grunge">After Effects</span>
+        <!-- Toolbox badges -->
+        <div class="pt-2">
+          <div class="text-xs uppercase tracking-wide text-neutral-400 mb-2">Toolbox</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="chip">Svelte</span>
+            <span class="chip">Astro</span>
+            <span class="chip">Tailwind</span>
+            <span class="chip">TypeScript</span>
+            <span class="chip">Figma</span>
+            <span class="chip">Blender</span>
+            <span class="chip">After Effects</span>
+            <span class="chip">DaVinci Resolve</span>
+          </div>
+        </div>
+
+        <!-- Quick stats -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div class="card p-3">
+            <div class="text-xs text-neutral-400">Years</div>
+            <div class="text-lg font-semibold text-white">6+</div>
+          </div>
+          <div class="card p-3">
+            <div class="text-xs text-neutral-400">Projects</div>
+            <div class="text-lg font-semibold text-white">120+</div>
+          </div>
+          <div class="card p-3">
+            <div class="text-xs text-neutral-400">Turnaround</div>
+            <div class="text-lg font-semibold text-white">1–3 wks</div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="mt-8 max-w-3xl">
-    <p class="text-neutral-300">
-      Longer story, process, principles. Keep line-length comfy.
-    </p>
+    <!-- Long-form copy under both columns -->
+    <div class="mt-10 max-w-3xl">
+      <p class="text-neutral-300">
+        I like systems that scale: clear type, reusable components, and motion that reinforces
+        your message. Whether we’re building a launch kit, a full brand identity, or a refresh,
+        the goal is simple—make your audience instantly understand and want more.
+      </p>
+    </div>
   </div>
 </section>

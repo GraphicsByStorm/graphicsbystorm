@@ -5,8 +5,5 @@ import ShopSection from "$svelteSec/ShopSection.svelte";
 ---
 <BaseLayout title="Shop — GraphicsByStorm">
   <Header />
-  <main class="section-wrap">
-    <h1 class="heading-2 mb-4">Shop</h1>
-    <ShopSection client:load />
-  </main>
+  <ShopSection client:load />
 </BaseLayout>

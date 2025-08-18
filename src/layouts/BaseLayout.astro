@@ -1,17 +1,27 @@
 ---
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = "GraphicsByStorm", description = "Design that sells." } = Astro.props;
+
+import "$styles/tailwind.css";
 import "$styles/theme.css";
 import BackgroundFX from "$components/BackgroundFX.astro";
-const { title = "GraphicsByStorm" } = Astro.props;
 ---
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" />
   </head>
-  <body class="antialiased">
+  <body class="bg-neutral-950 text-neutral-200">
     <BackgroundFX />
-    <slot />
+    <main>
+      <slot />
+    </main>
   </body>
 </html>

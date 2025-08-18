@@ -12,27 +12,27 @@ const amountCents = Math.round(price * 100);
 ---
 <BaseLayout title="Checkout — GraphicsByStorm">
   <Header />
-  <main class="section-wrap space-y-8">
-    <section class="card p-5">
-      <h1 class="heading-2">{title}</h1>
-      <p class="text-neutral-400 mt-1">${amountStr} USD</p>
-    </section>
+  <section class="section section-brand-wash torn-top torn-angle-right" style="--torn-color: var(--color-surface-950);">
+    <div class="section-inner space-y-8">
+      <section class="card p-5">
+        <h1 class="heading-2 text-white">{title}</h1>
+        <p class="text-neutral-300 mt-1">${amountStr} USD</p>
+      </section>
 
-    <section class="grid gap-6 md:grid-cols-3">
-      <div class="card p-5">
-        <h2 class="text-sm text-neutral-300 mb-2">PayPal</h2>
-        <PayPalButton client:load amount={amountStr} currency="USD" title={title} />
-      </div>
-
-      <div class="card p-5">
-        <h2 class="text-sm text-neutral-300 mb-2">Cash App Pay (Square)</h2>
-        <CashAppPayButton client:load amountCents={amountCents} currency="USD" title={title} />
-      </div>
-
-      <div class="card p-5">
-        <h2 class="text-sm text-neutral-300 mb-2">Crypto (Coinbase)</h2>
-        <CryptoButton client:load title={title} amountStr={amountStr} />
-      </div>
-    </section>
-  </main>
+      <section class="grid gap-6 md:grid-cols-3">
+        <div class="card p-5">
+          <h2 class="text-sm text-neutral-300 mb-2">PayPal</h2>
+          <PayPalButton client:load amount={amountStr} currency="USD" title={title} />
+        </div>
+        <div class="card p-5">
+          <h2 class="text-sm text-neutral-300 mb-2">Cash App Pay (Square)</h2>
+          <CashAppPayButton client:load amountCents={amountCents} currency="USD" title={title} />
+        </div>
+        <div class="card p-5">
+          <h2 class="text-sm text-neutral-300 mb-2">Crypto (Coinbase)</h2>
+          <CryptoButton client:load title={title} amountStr={amountStr} />
+        </div>
+      </section>
+    </div>
+  </section>
 </BaseLayout>

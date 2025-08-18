@@ -1,24 +1,45 @@
 ---
-import heroBg from '$assets/hero-overlay.jpg'; /* replace with your actual PNG */
+import heroBg from '$assets/hero.jpg';
 ---
-<section id="hero" class="section-wrap !py-20 relative overflow-hidden edge-rip">
-  <!-- Background image strictly behind + non-interactive -->
-    <div class="absolute inset-0 z-0 pointer-events-none">
-        <img src={heroBg.src} alt="" class="size-full object-cover opacity-40" />
-    </div>
+<section
+  id="hero"
+  class="section texture-grid torn-bottom torn-angle-right torn-overlay overflow-hidden
+         min-h-[52svh] md:min-h-[60svh]"
+  style={`--hero-bg: url(${heroBg.src});
+          --hero-size: contain;           /* show entire image */
+          --hero-pos: center bottom;
 
-  <!-- Vertical wordmark (non-interactive so it never blocks clicks) -->
-  <div class="absolute left-4 top-1/2 -translate-y-1/2 [writing-mode:vertical-rl] rotate-180
-              text-neutral-500 tracking-[0.2em] text-sm md:text-base select-none pointer-events-none">
+          /* fully cover the image edge */
+          --torn-overlap: 28px;
+          --torn-height: 56px;
+
+          /* fade to black downward */
+          --torn-fade: linear-gradient(to bottom, rgba(0,0,0,0) 18%, rgba(0,0,0,0.92) 100%);`}
+>
+  <!-- Background image under the overlay tear -->
+  <div
+    class="absolute inset-0 z-0 pointer-events-none"
+    style="background-image: var(--hero-bg);
+           background-size: var(--hero-size);
+           background-position: var(--hero-pos);
+           background-repeat: no-repeat;
+           opacity: .35;">
+  </div>
+
+  <!-- Vertical wordmark (non-interactive) -->
+  <div class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 [writing-mode:vertical-rl] rotate-180
+              text-neutral-400 tracking-[0.2em] text-[10px] md:text-xs select-none pointer-events-none z-10">
     GRAPHICSBYSTORM
   </div>
 
-  <div class="relative z-10 grid gap-6 md:grid-cols-2 items-center">
-    <h1 class="heading-hero">Design that sells.</h1>
-    <p class="text-neutral-300">High-impact graphics, branding, and motion for teams that move fast.</p>
+  <div class="section-inner relative z-10 grid gap-6 md:grid-cols-2 items-center">
+    <h1 class="heading-hero text-white">Design that sells.</h1>
+    <p class="text-neutral-200 max-w-prose">
+      High-impact graphics, branding, and motion for teams that move fast.
+    </p>
     <div class="flex gap-3">
-      <a href="#work" class="btn-primary hover-lift">See work</a>
-      <a href="#contact" class="btn-ghost hover-lift">Start a project</a>
+      <a href="#work" class="btn-brand">See work</a>
+      <a href="#contact" class="btn-ghost">Start a project</a>
     </div>
-</div>
+  </div>
 </section>

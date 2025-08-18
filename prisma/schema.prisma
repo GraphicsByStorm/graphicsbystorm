@@ -4,71 +4,69 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // e.g. file:./dev.db
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   addresses Address[]
+  sessions  Session[]
   orders    Order[]
+}
 
-  sessions Session[]
-  keys     Key[]
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique // sha256(sid)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Address {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   line1     String
   line2     String?
   city      String
   state     String?
   postal    String
   country   String
-  isDefault Boolean @default(false)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isDefault Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, isDefault]) // one default address per user
 }
 
 model Order {
   id          String      @id @default(cuid())
-  userId      String?
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   amountCents Int
   currency    String      @default("USD")
-  status      String      @default("created") // created|paid|failed|refunded
-  processor   String // paypal|square|coinbase
-  processorId String? // order id / payment id / charge id
+  processor   String // paypal | cashapp | crypto
+  status      String      @default("paid")
   createdAt   DateTime    @default(now())
-  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   items       OrderItem[]
 }
 
 model OrderItem {
   id         String @id @default(cuid())
   orderId    String
-  title      String
-  slug       String
-  priceCents Int
-  qty        Int    @default(1)
   order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-}
-
-// Lucia tables
-model Session {
-  id        String   @id
-  userId    String
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Key {
-  id             String  @id
-  userId         String
-  hashedPassword String?
-  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String
+  qty        Int
+  priceCents Int
 }

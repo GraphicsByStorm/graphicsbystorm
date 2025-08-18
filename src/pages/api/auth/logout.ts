@@ -1,11 +1,9 @@
-import type { APIRoute } from "astro";
-import { lucia } from "$lib/auth/lucia";
+import type { APIContext } from "astro";
+import { deleteSessionByToken, clearSessionCookie, SESSION_COOKIE } from "$lib/auth";
 
-export const POST: APIRoute = async ({ locals, cookies, redirect }) => {
-  if (locals.session) {
-    await lucia.invalidateSession(locals.session.id);
-  }
-  const blank = lucia.createBlankSessionCookie();
-  cookies.set(blank.name, blank.value, blank.attributes);
-  return redirect("/");
-};
+export async function POST(ctx: APIContext) {
+  const sid = ctx.cookies.get(SESSION_COOKIE)?.value;
+  if (sid) await deleteSessionByToken(sid);
+  clearSessionCookie(ctx);
+  return ctx.redirect("/");
+}

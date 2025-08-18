@@ -1,6 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": ["src", "astro.config.*", "svelte.config.*"],
+  "include": ["src", "astro.config.*", "svelte.config.*", "src/types"],
   "exclude": ["dist"],
   "compilerOptions": {
     "moduleResolution": "bundler",

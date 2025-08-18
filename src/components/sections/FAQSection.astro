@@ -5,17 +5,23 @@ const faqs = [
   { q: "Do you offer revisions?", a: "Yes. Each package includes a clear number of revision rounds." },
 ];
 ---
-<section id="faq" class="section-wrap">
-  <h2 class="heading-2 mb-4">FAQ</h2>
-  <div class="card-grunge divide-y divide-white/10 overflow-hidden">
-    {faqs.map((item) => (
-      <details class="group">
-        <summary class="flex items-center gap-3 cursor-pointer select-none p-4 hover:bg-white/[0.04] transition-colors">
-          <span class="inline-grid place-items-center size-6 rounded-sm border border-white/15 group-open:rotate-90 transition-transform">›</span>
-          <span class="text-sm">{item.q}</span>
-        </summary>
-        <div class="px-4 pb-4 text-neutral-300">{item.a}</div>
-      </details>
-    ))}
+<section
+  id="faq"
+  class="section torn-bottom torn-angle-left"
+  style="--torn-color: var(--color-surface-950);"
+>
+  <div class="section-inner">
+    <h2 class="heading-2 text-white mb-4">FAQ</h2>
+    <div class="card overflow-hidden divide-y divide-white/10">
+      {faqs.map((item) => (
+        <details class="group">
+          <summary class="flex items-center gap-3 cursor-pointer select-none p-4 hover:bg-white/[0.04] transition-colors">
+            <span class="inline-grid place-items-center size-6 rounded-sm border border-white/15 group-open:rotate-90 transition-transform text-white/80">›</span>
+            <span class="text-sm text-neutral-200">{item.q}</span>
+          </summary>
+          <div class="px-4 pb-4 text-neutral-300">{item.a}</div>
+        </details>
+      ))}
+    </div>
   </div>
 </section>

@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   integrations: [svelte()],
+  output: "server",
   vite: {
     plugins: [tailwindcss()],
     resolve: {

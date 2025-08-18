@@ -4,12 +4,14 @@ import Header from "$components/Header.astro";
 ---
 <BaseLayout title="Payment Cancelled — GraphicsByStorm">
   <Header />
-  <main class="section-wrap text-center space-y-4">
-    <h1 class="heading-2">Payment cancelled</h1>
-    <p class="text-neutral-400">No charges were made.</p>
-    <div class="flex items-center justify-center gap-3">
-      <a class="btn-primary" href="/checkout">Try again</a>
-      <a class="btn-ghost" href="/shop">Back to Shop</a>
+  <section class="section torn-top torn-angle-left" style="--torn-color: var(--color-surface-950);">
+    <div class="section-inner text-center space-y-4">
+      <h1 class="heading-2 text-white">Payment cancelled</h1>
+      <p class="text-neutral-300">No charges were made.</p>
+      <div class="flex items-center justify-center gap-3">
+        <a class="btn-brand" href="/checkout">Try again</a>
+        <a class="btn-ghost" href="/shop">Back to Shop</a>
+      </div>
     </div>
-  </main>
+  </section>
 </BaseLayout>
