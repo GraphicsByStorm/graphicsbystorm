@@ -1,0 +1,62 @@
+---
+const user = (Astro as any).locals?.user ?? null;
+
+const initials =
+  (user?.name
+    ?.split(/\s+/)
+    .map((n: string) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase()) ||
+  (user?.email?.[0]?.toUpperCase() ?? "U");
+---
+<details class="relative group">
+  <summary class="list-none">
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-neutral-900/60 px-3 py-1.5
+             hover:bg-neutral-800/60 transition"
+      aria-haspopup="menu"
+      aria-expanded="false"
+    >
+      <span class="grid place-items-center size-6 rounded-full bg-white text-black text-xs font-bold">
+        {initials}
+      </span>
+      <span class="hidden sm:inline text-sm text-neutral-200">
+        {user ? (user.name ?? user.email) : "Sign in"}
+      </span>
+      <svg class="size-4 text-neutral-400 group-open:rotate-180 transition-transform" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path d="M5.25 7.5 10 12.25 14.75 7.5h-9.5Z"/>
+      </svg>
+    </button>
+  </summary>
+
+  <div
+    role="menu"
+    class="absolute right-0 mt-2 w-56 rounded-lg border border-white/10 bg-neutral-950/95 backdrop-blur
+           shadow-xl p-1 z-50"
+  >
+    {user ? (
+      <>
+        <div class="px-3 py-2 text-xs text-neutral-400">
+          Signed in as<br />
+          <span class="text-neutral-200 truncate">{user.email}</span>
+        </div>
+        <a href="/account" role="menuitem"
+           class="block rounded px-3 py-2 text-sm text-neutral-200 hover:bg-white/10">Account</a>
+        <form method="post" action="/api/auth/logout">
+          <button role="menuitem" class="w-full text-left rounded px-3 py-2 text-sm text-neutral-200 hover:bg-white/10">
+            Logout
+          </button>
+        </form>
+      </>
+    ) : (
+      <>
+        <a href="/login" role="menuitem"
+           class="block rounded px-3 py-2 text-sm text-neutral-200 hover:bg-white/10">Login</a>
+        <a href="/register" role="menuitem"
+           class="block rounded px-3 py-2 text-sm text-neutral-200 hover:bg-white/10">Register</a>
+      </>
+    )}
+  </div>
+</details>

@@ -1,41 +1,33 @@
 ---
-import profileUrl from '$assets/profile.jpg';
-import { Image } from 'astro:assets';
-
-const badges = [
-    { cat: 'Frameworks', items: ['Astro', 'Svelte (Runes)', 'React'] },
-    { cat: 'Languages', items: ['HTML', 'CSS', 'JavaScript', 'TypeScript', 'Lua', 'Rust'] },
-    { cat: 'Design', items: ['Affinity Suite', 'Adobe Creative Suite', 'Figma'] },
-    { cat: '3D Modeling', items: ['Blender', 'Cinema 4D'] },
-    { cat: 'Video Editing', items: ['DaVinci Resolve', 'Adobe PremierePro', 'Sony Vegas'] },
-];
+import profile from '$assets/profile.jpg'; /* replace with your PNG */
 ---
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <div class="aspect-square bg-neutral-900 rounded-xl overflow-hidden">
-            <Image src={profileUrl} alt="Profile Picture" class="size-full object-cover"/>
-        </div>
-        <div class="space-y-a">
-            <div class="h-8 bg-neutral-900 rounded" />
-            <div class="h-8 bg-neutral-900 rounded" />
-            <div class="h-8 bg-neutral-900 rounded" />
-        </div>
+<section id="about" class="section-wrap">
+  <div class="grid gap-8 md:grid-cols-[minmax(220px,280px),1fr] items-start">
+    <div class="card overflow-hidden sticker tape-corner">
+      <img src={profile.src} alt="Profile" class="w-full h-auto" />
     </div>
 
-    <div class="mt-10 max-w-3xl">
-        <div class="h-24 bg-neutral-900 rounded" />
-    </div>
+    <div class="space-y-4">
+      <h2 class="heading-2">About</h2>
+      <p class="text-neutral-300">
+        Short intro — who you help, how you do it, results.
+      </p>
 
-    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {badges.map((b) => (
-            <div class="rounded-lg border border-white/10 p-4">
-                <div class="text-xs uppercase tracking-wider text-neutral-400 mb-2">{b.cat}</div>
-                <div class="flex flex-wrap gap-2">
-                    {b.items.map((t) => (
-                        <span class="text-xs px-2 py-1 rounded-full border border-white/15 text-neutral-300">{t}</span>
-                    ))}
-                </div>
-            </div>
-        ))}
+      <div class="flex flex-wrap gap-2 pt-2">
+        <span class="chip chip-grunge">Svelte</span>
+        <span class="chip chip-grunge">Astro</span>
+        <span class="chip chip-grunge">Tailwind</span>
+        <span class="chip chip-grunge">TypeScript</span>
+        <span class="chip chip-grunge">Figma</span>
+        <span class="chip chip-grunge">Blender</span>
+        <span class="chip chip-grunge">After Effects</span>
+      </div>
     </div>
-</div>
+  </div>
+
+  <div class="mt-8 max-w-3xl">
+    <p class="text-neutral-300">
+      Longer story, process, principles. Keep line-length comfy.
+    </p>
+  </div>
+</section>

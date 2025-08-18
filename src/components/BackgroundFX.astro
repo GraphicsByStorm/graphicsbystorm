@@ -1,0 +1,18 @@
+---
+/* Global background polish: grid + grain + vignette (non-interactive layers), monochrome + faint */
+---
+<div class="pointer-events-none fixed inset-0 -z-50 bg-neutral-950 bg-grid"></div>
+
+<!-- Grain via mask (neutral, very light) -->
+<div class="pointer-events-none fixed inset-0 -z-40"
+     style="
+      background-color: rgba(255,255,255,0.05);
+      -webkit-mask-image: var(--texture-noise);
+              mask-image: var(--texture-noise);
+      -webkit-mask-size: 384px 384px;
+              mask-size: 384px 384px;
+     "></div>
+
+<!-- Vignette -->
+<div class="pointer-events-none fixed inset-0 -z-30"
+     style="box-shadow: inset 0 0 240px 80px rgba(0,0,0,.55)"></div>

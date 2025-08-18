@@ -1,0 +1,18 @@
+---
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Header from "$components/Header.astro";
+---
+<BaseLayout title="Payment Successful — GraphicsByStorm">
+  <Header />
+  <main class="section-wrap text-center space-y-4">
+    <h1 class="heading-2">Thanks — Payment received</h1>
+    <p class="text-neutral-400">
+      You’ll get a confirmation email shortly. Your order will appear on the
+      <a class="link-underline" href="/orders">orders</a> page.
+    </p>
+    <div class="flex items-center justify-center gap-3">
+      <a class="btn-primary" href="/orders">View orders</a>
+      <a class="btn-ghost" href="/shop">Continue shopping</a>
+    </div>
+  </main>
+</BaseLayout>

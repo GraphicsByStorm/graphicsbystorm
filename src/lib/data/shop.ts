@@ -1,14 +1,31 @@
 export type Product = {
-    id: number;
-    slug: string;
-    title: string;
-    price: string;
-    tags: string[];
-    cover: string;
+  title: string;
+  slug: string;
+  price: string; // "$260.00"
+  cover: string; // image path or URL
+  tags: string[];
 };
 
 export const PRODUCTS: Product[] = [
-    { id:1, slug: 'logo-mini', title: 'Logo Mini', price: '$120', tags: ['Logos'], cover: '/placeholder/p1.jpg' },
-    { id:1, slug: 'streamer-package-x', title: 'Streamer Package X', price: '$260', tags: ['Stream Package'], cover: '/placeholder/p2.jpg' },
-    { id:1, slug: 'overlay-set', title: 'Overlay Set', price: '$80', tags: ['Overlays'], cover: '/placeholder/p3.jpg' },
+  {
+    title: "Logo Pack A",
+    slug: "logo-pack-a",
+    price: "$260.00",
+    cover: "/images/p1.jpg",
+    tags: ["Logos"]
+  },
+  {
+    title: "Stream Overlay",
+    slug: "overlay-01",
+    price: "$180.00",
+    cover: "/images/p2.jpg",
+    tags: ["Overlays", "Stream Packs"]
+  },
+  {
+    title: "Logo Pack B",
+    slug: "logo-pack-b",
+    price: "$320.00",
+    cover: "/images/p3.jpg",
+    tags: ["Logos"]
+  }
 ];

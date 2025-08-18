@@ -1,0 +1,34 @@
+---
+import { Image } from 'astro:assets';
+import logoPng from '$assets/smLogo.png';          // small raster placeholder
+import logoSvgUrl from '$assets/smLogo.svg?url';   // SVG as string URL
+
+const { href = '#hero', class: className = '' } = Astro.props as {
+  href?: string;
+  class?: string;
+};
+---
+<a href={href} class={`inline-flex items-center ${className}`} aria-label="GraphicsByStorm – Home">
+  <span class="relative inline-block">
+    <Image
+      src={logoPng}
+      alt="GraphicsByStorm"
+      class="h-8 w-auto transition-opacity duration-500 ease-out"
+      widths={[128, 256]}
+      sizes="(max-width: 640px) 128px, 256px"
+      format="png"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <img
+      src={logoSvgUrl}
+      alt=""
+      aria-hidden="true"
+      class="h-8 w-auto absolute inset-0 opacity-0 transition-opacity duration-500 ease-out"
+      decoding="async"
+      fetchpriority="low"
+      onload="this.classList.replace('opacity-0','opacity-100'); this.previousElementSibling?.classList.add('opacity-0')"
+      onerror="this.remove()"
+    />
+  </span>
+</a>

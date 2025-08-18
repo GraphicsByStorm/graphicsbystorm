@@ -1,20 +1,11 @@
-// src/lib/auth/lucia.ts
 import { Lucia } from "lucia";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "$lib/db"; // <-- use singleton
 
-export const prisma = new PrismaClient();
-
-// v3: PrismaAdapter(sessionModel, userModel)
 export const lucia = new Lucia(
   new PrismaAdapter(prisma.session, prisma.user),
   {
-    sessionCookie: {
-      attributes: {
-        secure: import.meta.env.PROD
-      }
-    },
-    // Expose selected DB fields on `locals.user`
+    sessionCookie: { attributes: { secure: import.meta.env.PROD } },
     getUserAttributes: (attrs) => ({
       email: attrs.email,
       name: attrs.name,
@@ -23,7 +14,6 @@ export const lucia = new Lucia(
   }
 );
 
-// Tell Lucia which instance type to use + what extra user fields exist
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;

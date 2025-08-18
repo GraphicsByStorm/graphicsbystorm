@@ -58,9 +58,7 @@ model OrderItem {
   order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
-/**
- * Lucia tables
- */
+// Lucia tables
 model Session {
   id        String   @id
   userId    String

@@ -1,54 +1,52 @@
 ---
 import BaseLayout from "$layouts/BaseLayout.astro";
 import Header from "$components/Header.astro";
-import SectionHeader from "$components/SectionHeader.astro";
 
-// Astro Files
-import AboutSection from "$compSec/AboutSection.astro";
-import ContactSection from "$compSec/ContactSection.astro";
-import FAQSection from "$compSec/FAQSection.astro";
+// Astro sections
 import HeroSection from "$compSec/HeroSection.astro";
+import AboutSection from "$compSec/AboutSection.astro";
 import ServicesSection from "$compSec/ServicesSection.astro";
+import FAQSection from "$compSec/FAQSection.astro";
+import ContactSection from "$compSec/ContactSection.astro";
 
-// Svelte Files
-import ShopSection from "$svelteSec/ShopSection.svelte";
+// Svelte sections
 import WorkSection from "$svelteSec/WorkSection.svelte";
+import ShopSection from "$svelteSec/ShopSection.svelte";
 ---
-
 <BaseLayout title="GraphicsByStorm">
-	<Header />
+  <Header />
 
-	<section id="hero" class="border-b border-white/10">
-		<HeroSection />
-	</section>
+  <section id="hero">
+    <HeroSection />
+  </section>
 
-	<section id="work" class="border-b border-white/10">
-		<SectionHeader label="Work" href="/work" />
-		<WorkSection client:load />
-	</section>
+  <section id="work">
+    <div class="section-wrap">
+      <h2 class="sr-only">Work</h2>
+      <WorkSection client:load />
+    </div>
+  </section>
 
-	<section id="about" class="border-b border-white/10">
-		<SectionHeader label="About" href="/about" />
-		<AboutSection />
-	</section>
+  <section id="about">
+    <AboutSection />
+  </section>
 
-	<section id="services" class="border-b border-white/10">
-		<SectionHeader label="Services" href="/services" />
-		<ServicesSection />
-	</section>
+  <section id="services">
+    <ServicesSection />
+  </section>
 
-	<section id="faq" class="border-b border-white/10">
-		<SectionHeader label="FAQ" href="/faq" />
-		<FAQSection />
-	</section>
+  <section id="faq">
+    <FAQSection />
+  </section>
 
-	<section id="shop" class="border-b border-white/10">
-		<SectionHeader label="Shop" href="/shop" />
-		<ShopSection client:load />
-	</section>
+  <section id="shop">
+    <div class="section-wrap">
+      <h2 class="sr-only">Shop</h2>
+      <ShopSection client:load />
+    </div>
+  </section>
 
-	<section id="contact" class="border-b border-white/10">
-		<SectionHeader label="Contact" href="/contact" />
-		<ContactSection />
-	</section>
+  <section id="contact">
+    <ContactSection />
+  </section>
 </BaseLayout>

@@ -6,31 +6,31 @@ import CashAppPayButton from "$svelte/payments/CashAppPayButton.svelte";
 import CryptoButton from "$svelte/payments/CryptoButton.svelte";
 
 const title = "Design Package";
-const price = 260.00;
+const price = 260.0;
 const amountStr = price.toFixed(2);
 const amountCents = Math.round(price * 100);
 ---
 <BaseLayout title="Checkout — GraphicsByStorm">
   <Header />
-  <main class="max-w-3xl mx-auto px-4 py-12 space-y-8">
-    <section class="rounded-lg border border-white/10 p-4">
-      <h1 class="text-xl text-white">{title}</h1>
-      <p class="text-neutral-400">${amountStr} USD</p>
+  <main class="section-wrap space-y-8">
+    <section class="card p-5">
+      <h1 class="heading-2">{title}</h1>
+      <p class="text-neutral-400 mt-1">${amountStr} USD</p>
     </section>
 
-    <section class="space-y-6">
-      <div>
+    <section class="grid gap-6 md:grid-cols-3">
+      <div class="card p-5">
         <h2 class="text-sm text-neutral-300 mb-2">PayPal</h2>
         <PayPalButton client:load amount={amountStr} currency="USD" title={title} />
       </div>
 
-      <div>
+      <div class="card p-5">
         <h2 class="text-sm text-neutral-300 mb-2">Cash App Pay (Square)</h2>
         <CashAppPayButton client:load amountCents={amountCents} currency="USD" title={title} />
       </div>
 
-      <div>
-        <h2 class="text-sm text-neutral-300 mb-2">Crypto (Coinbase Commerce)</h2>
+      <div class="card p-5">
+        <h2 class="text-sm text-neutral-300 mb-2">Crypto (Coinbase)</h2>
         <CryptoButton client:load title={title} amountStr={amountStr} />
       </div>
     </section>

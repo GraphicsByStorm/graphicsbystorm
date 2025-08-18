@@ -1,21 +1,23 @@
 ---
 const services = [
-    { name: 'Logo + Wordmark', price: '$450', bullets: ['2 concepts', '2 revisions', 'Brand Style Guide'] },
-    { name: 'Stream Branding Package', price: '$650', bullets: ['Logo/Overlays', 'Alerts', 'Panels'] },
-    { name: 'Logo + Wordmark', price: '$450', bullets: ['Astro + Tailwind', '5 Pages', 'Basic SEO'] },
+  { title: "Brand Identity", blurb: "Logo, palette, type, usage.", price: "$1,200" },
+  { title: "Web Design", blurb: "High-conversion marketing sites.", price: "$1,800" },
+  { title: "Motion Graphics", blurb: "Promo edits & animations.", price: "$900" },
 ];
 ---
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((s) => (
-            <article class="rounded-2xl border border-white/10 p-6 bg-neutral-950/50">
-                <h3 class="text-lg text-neutral-100">{s.name}</h3>
-                <div class="mt-2 text-2xl font-semibold text-white">{s.price}</div>
-                <ul class="mt-4 space-y-2 text-sm text-neutral-300">
-                    {s.bullets.map((b) => <li>• {b}</li>)}
-                </ul>
-                <div class="mt-6 h-10 bg-neutral-900 rounded" />
-            </article>
-        ))}
-    </div>
-</div>
+<section id="services" class="section-wrap">
+  <h2 class="heading-2 mb-6">Services</h2>
+  <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    {services.map((s) => (
+      <article class="card-grunge hover-lift p-5">
+        <h3 class="text-lg font-semibold">{s.title}</h3>
+        <p class="text-neutral-400 mt-1">{s.blurb}</p>
+        <div class="mt-4 text-2xl font-bold">{s.price}</div>
+        <div class="mt-4 flex gap-2">
+          <a href="#contact" class="btn-primary">Start</a>
+          <a href="#faq" class="btn-ghost">Details</a>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

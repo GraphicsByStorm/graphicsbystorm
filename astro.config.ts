@@ -1,9 +1,8 @@
-import { defineConfig } from 'astro/config'
-import svelte from '@astrojs/svelte'
-import tailwindcss from '@tailwindcss/vite'
-import path from 'node:path'
-
-const r = (p: string) => path.resolve(process.cwd(), p)
+// @ts-check
+import { defineConfig } from "astro/config";
+import svelte from "@astrojs/svelte";
+import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   integrations: [svelte()],
@@ -11,16 +10,16 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        $pages:     r('src/pages'),
-        $components:r('src/components'),
-        $compSec:   r('src/components/sections'),
-        $layouts:   r('src/layouts'),
-        $lib:       r('src/lib'),
-        $svelte:    r('src/svelte'),
-        $svelteSec: r('src/svelte/sections'),
-        $styles:    r('src/styles'),
-        $assets:    r('src/assets'),
-      }
-    }
-  }
-})
+        $pages:      fileURLToPath(new URL("./src/pages", import.meta.url)),
+        $components: fileURLToPath(new URL("./src/components", import.meta.url)),
+        $compSec:    fileURLToPath(new URL("./src/components/sections", import.meta.url)),
+        $layouts:    fileURLToPath(new URL("./src/layouts", import.meta.url)),
+        $lib:        fileURLToPath(new URL("./src/lib", import.meta.url)),
+        $svelte:     fileURLToPath(new URL("./src/svelte", import.meta.url)),
+        $svelteSec:  fileURLToPath(new URL("./src/svelte/sections", import.meta.url)),
+        $styles:     fileURLToPath(new URL("./src/styles", import.meta.url)),
+        $assets:     fileURLToPath(new URL("./src/assets", import.meta.url)),
+      },
+    },
+  },
+});

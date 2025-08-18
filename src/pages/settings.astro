@@ -1,0 +1,31 @@
+---
+export const prerender = false;
+
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Header from "$components/Header.astro";
+
+const { session, user } = Astro.locals;
+if (!session) return Astro.redirect("/login");
+---
+<BaseLayout title="Settings — GraphicsByStorm">
+  <Header />
+  <main class="section-wrap space-y-6 max-w-3xl">
+    <h1 class="heading-2">Settings</h1>
+
+    <section class="card p-5 space-y-3">
+      <h2 class="text-sm text-neutral-300">Security</h2>
+      <p class="text-neutral-400 text-sm">
+        Password resets and 2FA are coming soon.
+      </p>
+      <a class="btn-ghost w-fit" href="/account">← Back to Account</a>
+    </section>
+
+    <section class="card p-5 space-y-3">
+      <h2 class="text-sm text-neutral-300">Notifications</h2>
+      <p class="text-neutral-400 text-sm">
+        Email updates for order status and new drops.
+      </p>
+      <button class="btn-muted w-fit" disabled>Save (coming soon)</button>
+    </section>
+  </main>
+</BaseLayout>

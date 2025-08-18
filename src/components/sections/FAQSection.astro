@@ -1,44 +1,21 @@
 ---
-type FAQ = { q: string; a: string; id?: string };
-
-const defaults: FAQ[] = [
-  { q: "What’s your typical turnaround?", a: "Wireframe copy. Final content TBD." },
-  { q: "Do you offer rush projects?", a: "Wireframe copy. Final content TBD." },
-  { q: "What files do I receive?", a: "Wireframe copy. Final content TBD." },
+const faqs = [
+  { q: "How do we start?", a: "Share a brief in the contact form. I reply within 1 business day." },
+  { q: "What’s the timeline?", a: "Most projects are 1–3 weeks; brand packages 3–5 weeks." },
+  { q: "Do you offer revisions?", a: "Yes. Each package includes a clear number of revision rounds." },
 ];
-
-const { faqs = defaults } = Astro.props as { faqs?: FAQ[] };
-
-// single-open group name for the radio inputs
-const groupName = "faq-accordion";
 ---
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-3">
-  {faqs.map((f, i) => {
-    const id = f.id ?? `faq-${i}`;
-    return (
-      <div class="group rounded-lg border border-white/10 overflow-hidden">
-        <!-- radios keep only one item open at a time -->
-        <input id={id} class="peer hidden" type="radio" name={groupName} />
-        <label for={id}
-          class="flex items-center gap-3 px-4 py-3 cursor-pointer select-none hover:bg-white/5">
-          <!-- chevron -->
-          <span
-            class="inline-block transition-transform duration-200
-                   group-hover:rotate-90 peer-checked:rotate-90"
-            aria-hidden="true">›</span>
-          <span class="text-neutral-200">{f.q}</span>
-        </label>
-
-        <!-- content: expands on hover OR when checked; only “checked” persists -->
-        <div
-          class="max-h-0 overflow-hidden transition-[max-height] duration-300
-                 group-hover:max-h-40 peer-checked:max-h-40"
-          role="region" aria-labelledby={id}>
-          <div class="px-9 pb-4 text-neutral-300">
-            {f.a}
-          </div>
-        </div>
-      </div>
-    );
-  })}
-</div>
+<section id="faq" class="section-wrap">
+  <h2 class="heading-2 mb-4">FAQ</h2>
+  <div class="card-grunge divide-y divide-white/10 overflow-hidden">
+    {faqs.map((item) => (
+      <details class="group">
+        <summary class="flex items-center gap-3 cursor-pointer select-none p-4 hover:bg-white/[0.04] transition-colors">
+          <span class="inline-grid place-items-center size-6 rounded-sm border border-white/15 group-open:rotate-90 transition-transform">›</span>
+          <span class="text-sm">{item.q}</span>
+        </summary>
+        <div class="px-4 pb-4 text-neutral-300">{item.a}</div>
+      </details>
+    ))}
+  </div>
+</section>

@@ -1,16 +1,17 @@
 ---
-import "$styles/tailwind.css";
+import "$styles/theme.css";
+import BackgroundFX from "$components/BackgroundFX.astro";
 const { title = "GraphicsByStorm" } = Astro.props;
 ---
-<!doctype html>
-<html lang="en" class="dark">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="color-scheme" content="dark" />
-        <title>{title}</title>
-    </head>
-    <body class="bg-neutral-950 text-neutral-200 antialiased">
-        <slot />
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body class="antialiased">
+    <BackgroundFX />
+    <slot />
+  </body>
 </html>

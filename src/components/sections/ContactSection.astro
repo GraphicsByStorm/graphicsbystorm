@@ -1,14 +1,13 @@
----
-
----
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <form class="space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input class="h-11 rounded-md bg-neutral-900 border border-white/10 px-3" placeholder="Your name" />
-            <input class="h-11 rounded-md bg-neutral-900 border border-white/10 px-3" placeholder="Email" type="email" />
-        </div>
-        <input class="h-11 rounded-md bg-neutral-900 border border-white/10 px-3" placeholder="Project subject" />
-        <textarea name="" id="" class="min-h-32 rounded-md bg-neutral-900 border border-white/10 px-3 py-2" placeholder="Tell me about your project..."></textarea>
-        <div class="h-11 bg-neutral-900 border border-white/10 rounded-md" />
-    </form>
-</div>
+<section id="contact" class="section-wrap">
+  <h2 class="heading-2 mb-4">Contact</h2>
+  <form method="post" action="/api/contact" class="card-grunge p-5 space-y-4">
+    <div class="grid sm:grid-cols-2 gap-4">
+      <input name="name" placeholder="Your name" class="input" required />
+      <input name="email" type="email" placeholder="Email" class="input" required />
+    </div>
+    <input name="phone" placeholder="Phone (optional)" class="input" />
+    <input name="subject" placeholder="Project subject" class="input" />
+    <textarea name="message" placeholder="Tell me about your project…" class="textarea" required></textarea>
+    <button class="btn-primary hover-lift">Send</button>
+  </form>
+</section>

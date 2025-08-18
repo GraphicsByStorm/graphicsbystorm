@@ -1,0 +1,26 @@
+---
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Header from "$components/Header.astro";
+
+/* Minimal placeholder list — swap for your real data/source */
+const CASES = [
+  { slug: "awoke-gg", title: "Awoke.gg", summary: "Esports brand refresh." },
+  { slug: "motion-pack", title: "Motion Pack", summary: "Promo animations." },
+  { slug: "3d-stills", title: "3D Stills", summary: "Product renders." },
+];
+---
+<BaseLayout title="Case Studies — GraphicsByStorm">
+  <Header />
+  <main class="section-wrap">
+    <h1 class="heading-2 mb-6">Case Studies</h1>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {CASES.map((c) => (
+        <a href={`/case-study/${c.slug}`} class="card p-4 block">
+          <h2 class="text-lg font-semibold">{c.title}</h2>
+          <p class="text-neutral-400 mt-1">{c.summary}</p>
+          <span class="link-underline mt-3 inline-block">Read more →</span>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

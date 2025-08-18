@@ -1,0 +1,53 @@
+---
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Header from "$components/Header.astro";
+import { PRODUCTS } from "$lib/data/shop";
+import PayPalButton from "$svelte/payments/PayPalButton.svelte";
+import CashAppPayButton from "$svelte/payments/CashAppPayButton.svelte";
+import CryptoButton from "$svelte/payments/CryptoButton.svelte";
+
+const { slug } = Astro.params;
+const product = PRODUCTS.find((p) => p.slug === slug);
+if (!product) return Astro.redirect("/shop");
+
+const title = product.title;
+const amountStr = product.price.replace(/^\$/, "");
+const amountCents = Math.round(parseFloat(amountStr) * 100);
+---
+<BaseLayout title={`${title} — Shop — GraphicsByStorm`}>
+  <Header />
+
+  <main class="section-wrap">
+    <article class="grid gap-6 md:grid-cols-2">
+      <div class="card-grunge overflow-hidden sticker tape-corner">
+        <img src={product.cover} alt="" class="w-full h-auto object-cover" />
+      </div>
+
+      <div class="space-y-6">
+        <header>
+          <h1 class="heading-2">{title}</h1>
+          <p class="text-neutral-400 mt-1">{product.price} USD</p>
+        </header>
+
+        <section class="space-y-6">
+          <div>
+            <h2 class="text-sm text-neutral-300 mb-2">PayPal</h2>
+            <PayPalButton client:load amount={amountStr} currency="USD" title={title} />
+          </div>
+          <div>
+            <h2 class="text-sm text-neutral-300 mb-2">Cash App Pay</h2>
+            <CashAppPayButton client:load amountCents={amountCents} currency="USD" title={title} />
+          </div>
+          <div>
+            <h2 class="text-sm text-neutral-300 mb-2">Crypto</h2>
+            <CryptoButton client:load title={title} amountStr={amountStr} />
+          </div>
+        </section>
+
+        <div>
+          <a href="/shop" class="ink-underline">← Back to Shop</a>
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>

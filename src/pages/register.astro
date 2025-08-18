@@ -1,16 +1,26 @@
 ---
+export const prerender = false;
+
 import BaseLayout from "$layouts/BaseLayout.astro";
 import Header from "$components/Header.astro";
+
+const { session } = Astro.locals;
+if (session) return Astro.redirect("/account");
 ---
 <BaseLayout title="Register — GraphicsByStorm">
   <Header />
-  <main class="max-w-md mx-auto px-4 py-12">
-    <form method="post" action="/api/auth/register" class="space-y-4">
-      <input name="name" placeholder="Full name" class="w-full h-11 bg-neutral-900 border border-white/10 rounded px-3" required />
-      <input name="email" type="email" placeholder="Email" class="w-full h-11 bg-neutral-900 border border-white/10 rounded px-3" required />
-      <input name="phone" placeholder="Phone (optional)" class="w-full h-11 bg-neutral-900 border border-white/10 rounded px-3" />
-      <input name="password" type="password" placeholder="Password (min 8 chars)" class="w-full h-11 bg-neutral-900 border border-white/10 rounded px-3" required />
-      <button class="w-full h-11 bg-white text-black rounded">Create account</button>
+  <main class="section-wrap">
+    <h1 class="heading-2 mb-4">Register</h1>
+
+    <form method="post" action="/api/auth/register" class="card p-5 space-y-4 max-w-md">
+      <input class="input" type="text" name="name" placeholder="Full name" required />
+      <input class="input" type="email" name="email" placeholder="Email" required />
+      <input class="input" type="password" name="password" placeholder="Password (min 8 chars)" minlength="8" required />
+      <input class="input" type="tel" name="phone" placeholder="Phone (optional)" />
+      <button class="btn-primary w-full">Create account</button>
+      <p class="text-sm text-neutral-400">
+        Already have an account? <a class="link-underline" href="/login">Login</a>
+      </p>
     </form>
   </main>
 </BaseLayout>

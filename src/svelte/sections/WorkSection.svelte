@@ -1,74 +1,83 @@
 <script lang="ts">
-  import type { WorkItem } from '$lib/data/work';
-  import { WORK } from '$lib/data/work';
+  // Svelte 5 runes
+  const categories = ["All", "Branding", "Web", "3D", "Motion"] as const;
+  let active = $state<typeof categories[number]>("All");
 
-  const allTags: string[] = ['All', ...Array.from(new Set(WORK.flatMap(i => i.tags)))];
-  let filter = $state<string>('All');
-  const items = $state<WorkItem[]>(WORK);
-  const filtered = $derived(filter === 'All' ? items : items.filter(i => i.tags.includes(filter)));
+  type Work = {
+    title: string;
+    slug: string;
+    cover: string;
+    blurb: string;
+    tags: string[];
+    images: string[];
+  };
 
+  // Placeholder data — replace with your real content/images
+  let items = $state<Work[]>([
+    { title: "Awoke.gg", slug: "awoke-gg", cover: "/images/work1.jpg", blurb: "Esports brand refresh.", tags: ["Branding"], images: ["/images/work1.jpg","/images/work1b.jpg"] },
+    { title: "Motion Pack", slug: "motion-pack", cover: "/images/work2.jpg", blurb: "Promo animations.", tags: ["Motion"], images: ["/images/work2.jpg"] },
+    { title: "3D Stills", slug: "3d-stills", cover: "/images/work3.jpg", blurb: "Product renders.", tags: ["3D"], images: ["/images/work3.jpg","/images/work3b.jpg"] },
+  ]);
+
+  const filtered = $derived(
+    active === "All" ? items : items.filter((i) => i.tags.includes(active as string))
+  );
+
+  // Modal state
   let modalOpen = $state(false);
   let activeIndex = $state<number | null>(null);
   let slideIndex = $state(0);
 
-  function openModal(i: number) {
-    activeIndex = i; slideIndex = 0; modalOpen = true;
-    document.documentElement.style.overflow = 'hidden';
-  }
-  function closeModal() {
-    modalOpen = false; activeIndex = null; document.documentElement.style.overflow = '';
-  }
-  function next() {
-    if (activeIndex == null) return;
-    const imgs = filtered[activeIndex].images;
-    slideIndex = (slideIndex + 1) % imgs.length;
-  }
-  function prev() {
-    if (activeIndex == null) return;
-    const imgs = filtered[activeIndex].images;
-    slideIndex = (slideIndex - 1 + imgs.length) % imgs.length;
-  }
+  const openModal = (i: number) => { activeIndex = i; slideIndex = 0; modalOpen = true; };
+  const closeModal = () => { modalOpen = false; activeIndex = null; };
+  const next = () => { if (activeIndex === null) return; slideIndex = (slideIndex + 1) % filtered[activeIndex].images.length; };
+  const prev = () => { if (activeIndex === null) return; slideIndex = (slideIndex - 1 + filtered[activeIndex].images.length) % filtered[activeIndex].images.length; };
 
-  // gestures & window events
-  let touchX = 0;
-  function onTouchStart(e: TouchEvent) { touchX = e.touches[0].clientX; }
-  function onTouchEnd(e: TouchEvent) {
-    const dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 40) (dx < 0 ? next() : prev());
-  }
-  function onWindowWheel(e: WheelEvent) {
-    if (!modalOpen) return;
-    if (e.deltaY > 0) next(); else prev();
-  }
   function onWindowKey(e: KeyboardEvent) {
     if (!modalOpen) return;
-    if (e.key === 'Escape') return closeModal();
-    if (e.key === 'ArrowRight') return next();
-    if (e.key === 'ArrowLeft') return prev();
+    if (e.key === "Escape") closeModal();
+    if (e.key === "ArrowRight") next();
+    if (e.key === "ArrowLeft") prev();
+  }
+
+  function onWindowWheel(e: WheelEvent) {
+    if (!modalOpen) return;
+    e.deltaY > 0 ? next() : prev();
+  }
+
+  let touchX = 0;
+  function onTouchStart(e: TouchEvent) { touchX = e.changedTouches[0].clientX; }
+  function onTouchEnd(e: TouchEvent) {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (dx > 30) prev(); else if (dx < -30) next();
   }
 </script>
 
-<svelte:window onwheel={onWindowWheel} onkeydown={onWindowKey} />
+<svelte:window onkeydown={onWindowKey} onwheel={onWindowWheel} />
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-  <div class="mb-6 flex flex-wrap gap-2">
-    {#each allTags as t}
+<section id="work" class="section-wrap">
+  <h2 class="heading-2 mb-4">Selected work</h2>
+
+  <!-- Filter chips -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    {#each categories as t}
       <button
-        class={`px-3 py-1 rounded-full border border-white/15 text-sm ${
-          filter === t ? 'bg-white text-black' : 'text-neutral-300'
-        }`}
-        onclick={() => (filter = t)}
-      >{t}</button>
+        class={"chip chip-grunge " + (active === t ? "chip-active" : "")}
+        onclick={() => (active = t)}
+        aria-pressed={active === t}
+        type="button"
+      >
+        {t}
+      </button>
     {/each}
   </div>
 
-  <div class="grid grid-cols-12 gap-4">
+  <!-- Grid -->
+  <div class="grid grid-cols-12 gap-3 md:gap-4">
     {#each filtered as item, i}
       <button
         type="button"
-        class="group relative cursor-pointer rounded-xl overflow-hidden bg-neutral-900
-               col-span-12 md:col-span-7 [&:nth-child(2n)]:md:col-span-5
-               [&:nth-child(3n)]:md:col-span-4 [&:nth-child(4n)]:md:col-span-8"
+        class="card-grunge hover-lift group relative overflow-hidden col-span-12 md:col-span-6 xl:col-span-4 tape-corner"
         onclick={() => openModal(i)}
       >
         <img src={item.cover} alt="" class="size-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -77,49 +86,31 @@
       </button>
     {/each}
   </div>
-</div>
 
-{#if modalOpen && activeIndex !== null}
-  <div
-    class="fixed inset-0 z-50 grid place-items-center"
-    role="dialog"
-    aria-modal="true"
-    tabindex="-1"
-  >
-    <!-- Backdrop: accessible button that closes the dialog -->
-    <button
-      type="button"
-      aria-label="Close dialog"
-      class="absolute inset-0 bg-black/80"
-      onclick={closeModal}
-    ></button>
-
-    <!-- Dialog content (no onclick needed) -->
-    <div
-      class="relative z-10 max-w-5xl w-full p-4"
-      ontouchstart={onTouchStart}
-      ontouchend={onTouchEnd}
-    >
-      {#if filtered[activeIndex]}
+  <!-- Modal -->
+  {#if modalOpen && activeIndex !== null}
+    <div class="fixed inset-0 z-50 grid place-items-center" role="dialog" aria-modal="true" tabindex="-1">
+      <button type="button" aria-label="Close dialog" class="absolute inset-0 bg-black/80" onclick={closeModal}></button>
+      <div class="relative z-10 w-full max-w-5xl p-4 card-grunge" ontouchstart={onTouchStart} ontouchend={onTouchEnd}>
         <img
           src={filtered[activeIndex].images[slideIndex]}
           alt=""
-          class="mx-auto max-h-[70svh] object-contain rounded"
+          class="mx-auto max-h-[70svh] object-contain rounded-lg"
         />
-        <button class="absolute top-4 right-4 h-9 w-9 rounded-full bg-white text-black" onclick={closeModal} aria-label="Close">✕</button>
+        <button class="absolute top-4 right-4 btn-muted !px-0 !py-0 size-9 rounded-full" onclick={closeModal} aria-label="Close">✕</button>
 
         <div class="mt-4 flex justify-between items-center text-sm text-neutral-300">
-          <button class="px-3 py-1 rounded border border-white/20" onclick={prev} aria-label="Previous image">Prev</button>
+          <button class="btn-ghost" onclick={prev}>Prev</button>
           <span>{slideIndex + 1} / {filtered[activeIndex].images.length}</span>
-          <button class="px-3 py-1 rounded border border-white/20" onclick={next} aria-label="Next image">Next</button>
+          <button class="btn-ghost" onclick={next}>Next</button>
         </div>
 
         <div class="mt-6">
-          <h3 class="text-xl font-semibold text-white">{filtered[activeIndex].title}</h3>
+          <h3 class="heading-2">{filtered[activeIndex].title}</h3>
           <p class="mt-2 text-neutral-300">{filtered[activeIndex].blurb}</p>
-          <a class="inline-block mt-4 underline" href={`/case-study/${filtered[activeIndex].slug}`}>Read full case study →</a>
+          <a class="ink-underline mt-3 inline-block" href={`/case-study/${filtered[activeIndex].slug}`}>Read full case study →</a>
         </div>
-      {/if}
+      </div>
     </div>
-  </div>
-{/if}
+  {/if}
+</section>
