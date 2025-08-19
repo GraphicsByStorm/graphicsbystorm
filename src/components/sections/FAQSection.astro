@@ -1,27 +1,214 @@
 ---
-const faqs = [
-  { q: "How do we start?", a: "Share a brief in the contact form. I reply within 1 business day." },
-  { q: "What’s the timeline?", a: "Most projects are 1–3 weeks; brand packages 3–5 weeks." },
-  { q: "Do you offer revisions?", a: "Yes. Each package includes a clear number of revision rounds." },
-];
+import type { FAQGroup } from '$lib/data/faqs';
+import { FAQ_GROUPS } from '$lib/data/faqs';
+
+const groups: FAQGroup[] = FAQ_GROUPS;
+
+// JSON-LD (flatten groups)
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: groups.flatMap(g =>
+    g.items.map(i => ({
+      '@type': 'Question',
+      name: i.q,
+      acceptedAnswer: { '@type': 'Answer', text: i.a }
+    }))
+  )
+};
 ---
-<section
-  id="faq"
-  class="section torn-bottom torn-angle-left"
-  style="--torn-color: var(--color-surface-950);"
->
-  <div class="section-inner">
-    <h2 class="heading-2 text-white mb-4">FAQ</h2>
-    <div class="card overflow-hidden divide-y divide-white/10">
-      {faqs.map((item) => (
-        <details class="group">
-          <summary class="flex items-center gap-3 cursor-pointer select-none p-4 hover:bg-white/[0.04] transition-colors">
-            <span class="inline-grid place-items-center size-6 rounded-sm border border-white/15 group-open:rotate-90 transition-transform text-white/80">›</span>
-            <span class="text-sm text-neutral-200">{item.q}</span>
-          </summary>
-          <div class="px-4 pb-4 text-neutral-300">{item.a}</div>
-        </details>
+
+<section id="faq" class="section bg-[var(--surface-0,#0a0a0a)]">
+  <div class="mx-auto max-w-6xl px-4 py-12 sm:py-14 lg:py-16">
+    <div class="mb-6 flex items-center justify-between gap-3">
+      <h2 class="text-[clamp(1.35rem,2.2vw,1.75rem)] font-extrabold tracking-tight text-white">
+        <span class="mr-2 inline-block h-3 w-1.5 translate-y-[2px] rounded-full"
+              style="background: var(--color-brand-500,#E2A028);"></span>
+        Frequently Asked Questions
+      </h2>
+
+      <div class="hidden sm:flex gap-2">
+        <a href="/#contact"
+           class="inline-flex items-center rounded-md bg-[var(--color-brand-500,#E2A028)] px-3.5 py-2 text-[13px] font-semibold text-black shadow hover:opacity-90">
+          Start a project
+        </a>
+        <a href="/shop"
+           class="inline-flex items-center rounded-md border border-white/10 bg-white/[.05] px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-white/[.1]">
+          Can’t wait? Premade work →
+        </a>
+      </div>
+    </div>
+
+    <!-- Two themed columns -->
+    <div class="grid gap-6 md:grid-cols-2">
+      {groups.map((g) => (
+        <div class="space-y-3">
+          <h3 class="group-title">
+            <span class="group-dot" /> {g.title}
+          </h3>
+
+          {g.items.map((f) => {
+            const id = `faq-${f.slug}`;
+            return (
+              <details id={id} class="faq">
+                <summary class="faq__summary" tabindex="0">
+                  <span class="faq__q">{f.q}</span>
+                  <svg class="faq__chev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M8.12 9.29L12 13.17l3.88-3.88a1 1 0 1 1 1.41 1.41l-4.59 4.58a1 1 0 0 1-1.41 0L6.7 10.7a1 1 0 1 1 1.42-1.41z"/>
+                  </svg>
+                </summary>
+                <div class="faq__a">{f.a}</div>
+              </details>
+            );
+          })}
+        </div>
       ))}
     </div>
+
+    <div class="mt-5 text-center sm:hidden">
+      <a href="/#contact"
+         class="inline-flex items-center rounded-md bg-[var(--color-brand-500,#E2A028)] px-3.5 py-2 text-[13px] font-semibold text-black shadow hover:opacity-90">
+        Start a project
+      </a>
+      <a href="/shop"
+         class="ml-2 inline-flex items-center rounded-md border border-white/10 bg-white/[.05] px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-white/[.1]">
+        Premade work →
+      </a>
+    </div>
   </div>
+
+  <!-- SEO: FAQPage JSON-LD -->
+  <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+
+  <!-- Pure JS behavior: deep link + single-open + open on hover/focus -->
+  <script is:inline>
+    (function () {
+      const root = document.currentScript.closest('section#faq');
+      if (!root) return;
+
+      const items = Array.from(root.querySelectorAll('details.faq'));
+      const summaries = Array.from(root.querySelectorAll('.faq__summary'));
+
+      function closeOthers(current) {
+        items.forEach((d) => { if (d !== current) d.open = false; });
+      }
+
+      // Single-open accordion
+      root.addEventListener('toggle', (e) => {
+        const d = e.target;
+        if (!(d instanceof HTMLDetailsElement)) return;
+        if (d.open) closeOthers(d);
+      });
+
+      // Deep-link: #faq-<slug>
+      function openByHash() {
+        const id = location.hash.slice(1);
+        if (!id) return;
+        const t = root.querySelector('#' + (window.CSS && CSS.escape ? CSS.escape(id) : id));
+        if (!(t instanceof HTMLDetailsElement)) return;
+        t.open = true;
+        closeOthers(t);
+        t.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+      if (location.hash) openByHash();
+      window.addEventListener('hashchange', openByHash);
+
+      // Open on hover (mouseenter with tiny delay) and on keyboard focus
+      let hoverTimer = 0;
+      root.addEventListener('mouseenter', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        const d = target.closest('details.faq');
+        if (!(d instanceof HTMLDetailsElement)) return;
+        clearTimeout(hoverTimer);
+        hoverTimer = window.setTimeout(() => {
+          if (!d.open) { d.open = true; closeOthers(d); }
+        }, 120);
+      }, true);
+
+      root.addEventListener('focusin', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        const d = target.closest('details.faq');
+        if (!(d instanceof HTMLDetailsElement)) return;
+        if (!d.open) { d.open = true; closeOthers(d); }
+      });
+
+      // Keyboard toggle for summary
+      summaries.forEach((s) => {
+        s.style.cursor = 'pointer';
+        s.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            const d = s.parentElement;
+            if (d instanceof HTMLDetailsElement) {
+              d.open = !d.open;
+              if (d.open) closeOthers(d);
+            }
+          }
+        });
+      });
+    })();
+  </script>
 </section>
+
+<style>
+  .group-title {
+    display: flex; align-items: center; gap: .5rem;
+    color: #e8eaed; font-weight: 800; letter-spacing: .2px;
+    font-size: .9rem; text-transform: uppercase;
+  }
+  .group-dot {
+    display: inline-block; width: .35rem; height: 1rem; border-radius: .25rem;
+    background: var(--color-brand-500,#E2A028);
+  }
+
+  .faq {
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.04);
+    overflow: hidden;
+  }
+  .faq[open] { background: rgba(255,255,255,.055); }
+
+  .faq__summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .8rem .9rem;
+    position: relative;
+    outline: none;
+  }
+  .faq__summary::-webkit-details-marker { display: none; }
+  .faq__summary:focus-visible {
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-brand-500,#E2A028) 60%, transparent);
+    border-radius: 10px;
+  }
+
+  .faq__q {
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: .2px;
+    font-size: .98rem;
+    flex: 1;
+  }
+
+  .faq__chev {
+    color: #dfe3e7;
+    transition: transform .15s ease, color .15s ease;
+    flex: none;
+  }
+  .faq[open] .faq__chev {
+    transform: rotate(180deg);
+    color: var(--color-brand-500,#E2A028);
+  }
+
+  .faq__a {
+    color: rgba(230,230,230,.92);
+    font-size: .92rem;
+    line-height: 1.55;
+    padding: 0 .9rem .9rem;
+  }
+</style>
