@@ -2,25 +2,56 @@
 import BaseLayout from "$layouts/BaseLayout.astro";
 import Header from "$components/Header.astro";
 
-// Sections
+// Static/SSR sections
 import HeroSection from "$compSec/HeroSection.astro";
 import AboutSection from "$compSec/AboutSection.astro";
 import ServicesSection from "$compSec/ServicesSection.astro";
 import FAQSection from "$compSec/FAQSection.astro";
 import ContactSection from "$compSec/ContactSection.astro";
 
-// Svelte sections
+// Svelte “islands”
 import WorkSection from "$svelteSec/WorkSection.svelte";
 import ShopSection from "$svelteSec/ShopSection.svelte";
+
+// Data source (typed)
+import { WORKS } from "$lib/data/work";
+
+// Allow future transforms (e.g., sort, filter, slice)
+const workItems = Array.isArray(WORKS) ? WORKS : [];
+const hasWork = workItems.length > 0;
 ---
+
 <BaseLayout title="GraphicsByStorm">
   <Header />
 
   <HeroSection />
-  <WorkSection client:load />
+
+  {hasWork ? (
+    // Hydrate when scrolled into view; switch to client:load if you need immediate interactivity
+    <WorkSection items={workItems} client:visible />
+  ) : (
+    // Safe fallback if WORK is empty during refactors/content changes
+    <section class="py-10">
+      <div class="mx-auto max-w-5xl px-4 text-neutral-400">
+        <h2 class="mb-2 text-xl font-semibold text-white">Selected Work</h2>
+        <p>Portfolio is being updated. Check back shortly.</p>
+      </div>
+    </section>
+  )}
+
   <AboutSection />
   <ServicesSection />
   <FAQSection />
-  <ShopSection client:load />
+
+  {/* Shop is also a Svelte island—hydrate lazily for perf */}
+  <ShopSection client:visible />
+
   <ContactSection />
 </BaseLayout>
+
+<!-- Optional: preconnects (keep minimal & only if you really use them) -->
+<!--
+<head>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+-->

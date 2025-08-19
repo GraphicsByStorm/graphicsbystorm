@@ -95,7 +95,7 @@ export const WORKS: WorkItem[] = [
       "Vector clarity and print-fidelity mockups."
     ],
     cover: "/images/work/awoke/cover.png",
-    images: ["/images/work/awoke/01.png", "/images/work/awoke/02.png"]
+    images: ["/images/work/awoke/01.png"]
   },
   {
     title: "Obsidian Tides Twitter Header",
