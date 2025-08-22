@@ -7,7 +7,9 @@ const { title = "GraphicsByStorm", description = "Design that sells." } = Astro.
 
 import "$styles/tailwind.css";
 import "$styles/theme.css";
+import SocialNav from '$svelte/components/SocialNav.svelte';
 import BackgroundFX from "$components/BackgroundFX.astro";
+import Header from "$components/Header.astro";
 ---
 <!doctype html>
 <html lang="en">
@@ -18,9 +20,11 @@ import BackgroundFX from "$components/BackgroundFX.astro";
     <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" />
   </head>
-  <body class="bg-neutral-950 text-neutral-200">
+  <body class="min-h-dvh bg-neutral-950 text-neutral-100 antialiased">
+    <Header />
     <BackgroundFX />
     <main>
+      <SocialNav client:load />
       <slot />
     </main>
   </body>

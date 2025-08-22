@@ -1,10 +1,10 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": ["src", "astro.config.*", "svelte.config.*", "src/types"],
-  "exclude": ["dist", "src/content/**"],           // ⬅ add this
+  "exclude": ["dist", "src/content/**"],
   "compilerOptions": {
     "moduleResolution": "bundler",
-    "types": ["astro/client"],                     // no astro/content here
+    "types": ["astro/client"],
     "baseUrl": ".",
     "paths": {
       "$pages/*": ["src/pages/*"],

@@ -1,13 +1,26 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
-import Header from '$components/Header.astro';
-import WorkSection from '$svelteSec/WorkSection.svelte';
-import SectionHeader from '$components/SectionHeader.astro';
+import WorkSection from '$svelte/components/WorkSection.svelte';
+import { WORKS } from '$lib/data/work';
+import { WORK_META } from '$lib/data/workMeta';
+
+type Details = { tools?: string; design?: string; creativity?: string; critique?: string; directions?: string; craftsmanship?: string; };
+type WorkItem = typeof WORKS[number];
+type WorkItemWithDetails = WorkItem & { details?: Details };
+
+const items: WorkItemWithDetails[] = WORKS.map((w) => {
+  const meta = (WORK_META as Record<string, { details?: Details }>)[w.slug] ?? {};
+  return { ...w, details: meta.details };
+});
+
+// Astro + Svelte runes prop inference workaround
+const workProps: any = { items };
+
+export const prerender = true;
 ---
-<BaseLayout title="Work">
-    <Header />
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <SectionHeader label="Work" href="/#work" />
-        <WorkSection client:load />
-    </main>
+
+<BaseLayout title="Work • GraphicsByStorm" description="Selected work and case studies">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <WorkSection {...workProps} client:visible />
+  </main>
 </BaseLayout>

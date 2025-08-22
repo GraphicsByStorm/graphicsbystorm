@@ -1,6 +1,7 @@
 ---
+// File: src/components/Header.astro
 import LogoAsync from '$components/LogoAsync.astro';
-import UserMenu from '$components/UserMenu.astro';
+import UserMenu from '$svelte/components/UserMenu.svelte';
 
 const leftLinks = [
   { href: "#hero", label: "Home" },
@@ -17,8 +18,10 @@ const rightLinks = [
 
 const isHome = Astro.url.pathname === "/";
 const withBase = (hash: string) => (isHome ? hash : `/${hash}`);
+
+const { user } = Astro.locals;
 ---
-<header class="header-surface relative noise-overlay">
+<header class="sticky header-surface noise-overlay">
   <nav class="header-inner" aria-label="Primary">
     <div class="header-bar">
       <!-- Left (desktop) -->
@@ -40,7 +43,7 @@ const withBase = (hash: string) => (isHome ? hash : `/${hash}`);
             <li><a href={withBase(item.href)} class="nav-link">{item.label}</a></li>
           ))}
         </ul>
-        <UserMenu />
+        <UserMenu client:load user={user} />
       </div>
 
       <!-- Mobile: single-row rail + user menu -->
@@ -56,7 +59,7 @@ const withBase = (hash: string) => (isHome ? hash : `/${hash}`);
             ))}
           </ul>
         </div>
-        <UserMenu />
+        <UserMenu client:load strategy="fixed" user={user} />
       </div>
     </div>
   </nav>

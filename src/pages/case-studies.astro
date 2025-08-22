@@ -1,27 +1,24 @@
 ---
-import BaseLayout from "$layouts/BaseLayout.astro";
-import Header from "$components/Header.astro";
-
-const CASES = [
-  { slug: "awoke-gg", title: "Awoke.gg", summary: "Esports brand refresh." },
-  { slug: "motion-pack", title: "Motion Pack", summary: "Promo animations." },
-  { slug: "3d-stills", title: "3D Stills", summary: "Product renders." },
-];
+import { WORKS } from '../lib/data/work';
+export const prerender = true;
 ---
-<BaseLayout title="Case Studies — GraphicsByStorm">
-  <Header />
-  <section class="section torn-top torn-angle-right" style="--torn-color: var(--color-surface-950);">
-    <div class="section-inner">
-      <h1 class="heading-2 text-white mb-6">Case Studies</h1>
+
+<html lang="en">
+  <body class="bg-[var(--surface-1,#0b0b0b)] text-neutral-100">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-6">
+        <span class="mr-2 inline-block h-4 w-1.5 translate-y-[2px] rounded-full" style="background: var(--color-brand-500,#E2A028);"></span>
+        Case Studies
+      </h1>
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {CASES.map((c) => (
-          <a href={`/case-study/${c.slug}`} class="card p-4 block hover-lift">
+        {WORKS.map((c) => (
+          <a href={`/case-study/${c.slug}`} class="block rounded-xl border border-white/10 bg-white/5 p-4 hover:opacity-95 transition">
             <h2 class="text-lg font-semibold text-white">{c.title}</h2>
             <p class="text-neutral-300 mt-1">{c.summary}</p>
-            <span class="link-underline mt-3 inline-block">Read more →</span>
+            <span class="mt-3 inline-block underline decoration-[var(--color-brand-500,#E2A028)] underline-offset-4">Read more →</span>
           </a>
         ))}
       </div>
-    </div>
-  </section>
-</BaseLayout>
+    </section>
+  </body>
+</html>
