@@ -3,7 +3,7 @@ import type { WorkItem } from "./work";
 
 /**
  * Long-form rubric content surfaced in the Lightbox + case-study pages.
- * Each field is optional; render only if present.
+ * Each field is optional in the type, but our entries below provide all of them.
  */
 export type CaseStudyDetails = {
   /** Working Knowledge of Software & Digital Tools */
@@ -20,13 +20,64 @@ export type CaseStudyDetails = {
   craftsmanship?: string;
 };
 
+/** Optional, structured design metadata used on case-study pages */
+export type TypographyMeta = {
+  /** e.g., "Inter", "SF Pro", "Bookmania" */
+  family: string;
+  /** e.g., ["400","600","700"] or ["Regular","Semibold","Bold"] */
+  weights?: string[];
+  /** e.g., ["Google Fonts", "Adobe Fonts", "Local @font-face"] */
+  sources?: string[];
+  /** Additional notes on pairing, tracking, usage, etc. */
+  notes?: string;
+};
+
+export type PaletteColor = {
+  /** Friendly name like "Obsidian", "Accent", "Cream" */
+  name: string;
+  /** Primary color in HEX form (required) */
+  hex: string;
+  /** Optional RGB(A) string, e.g. "226,160,40" or "226,160,40,0.9" */
+  rgb?: string;
+  /** Optional HSL string, e.g. "40,76%,52%" */
+  hsl?: string;
+};
+
+export type ProcessStep = {
+  /** Milestone label, e.g. "Brief & Goals", "Monogram Study", "Handoff" */
+  label: string;
+  /** Optional date string, e.g. "2023-10" or "Oct 2023" */
+  date?: string;
+  /** Optional note describing the milestone */
+  note?: string;
+};
+
+/**
+ * Extra per-slug metadata
+ * - coverPosition: controls overlay image fit behavior for banner-like images
+ * - date: free-form date string (e.g., "Nov 2023", "2024-03")
+ * - year: numeric badge shown in the overlay footer (hidden if undefined)
+ * - typography/palette/process: optional design system + timeline metadata
+ */
+type ExtraOverlayMeta = {
+  coverPosition?: "top" | "contain" | "cover";
+  date?: string;
+  year?: number;
+  typography?: TypographyMeta;
+  palette?: PaletteColor[];
+  process?: ProcessStep[];
+};
+
 /** Metadata overrides/augments keyed by slug */
-export type WorkMeta = Partial<WorkItem> & { details?: CaseStudyDetails };
+export type WorkMeta = Partial<WorkItem> & { details?: CaseStudyDetails } & ExtraOverlayMeta;
 
 /**
  * Metadata for each case study keyed by slug.
  * Use this with a folder-scan approach (images from /public/images/work/[slug])
  * or simply as a central source of truth for titles, tags, summaries, etc.
+ *
+ * NOTE: We intentionally populate every optional field for each entry so
+ * downstream UI can rely on their presence without defensive checks.
  */
 export const WORK_META: Record<string, WorkMeta> = {
   "fritz-streaming-social": {
@@ -43,19 +94,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Consistent hierarchy, alignment, and balance across assets."
     ],
     cover: "/images/work/fritz/cover.png",
+    coverPosition: "contain",
+    date: "2024-03",
+    year: 2024,
+    typography: {
+      family: "Inter",
+      weights: ["500", "600", "800"],
+      sources: ["Google Fonts"],
+      notes:
+        "Inter provides high x-height and excellent small-size rendering for panel labels and overlay HUD text. Display moments use heavier weights with slight positive tracking to survive Twitch compression and variable stream scales."
+    },
+    palette: [
+      { name: "UI Obsidian", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
+      { name: "Muted Charcoal", hex: "#1E1E1E", rgb: "30,30,30", hsl: "0,0%,12%" },
+      { name: "Brand Accent", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
+      { name: "Panel Ink", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+    ],
+    process: [
+      { label: "Brief & Constraints", date: "2024-02-10", note: "Clarified Twitch safe areas and panel behavior across desktop/mobile." },
+      { label: "Grid & Type Studies", date: "2024-02-15", note: "Explored modular panel grids and micro-type treatments for legibility." },
+      { label: "Texture & Tone", date: "2024-02-20", note: "Added controlled digital-noise layers that survive compression without muddying." },
+      { label: "Overlay Pass & QA", date: "2024-03-02", note: "Live test on stream; tweaked contrast and stroke weights per feedback." },
+      { label: "Export & Handoff", date: "2024-03-06", note: "Delivered organized asset pack with naming, sizes, and update notes." }
+    ],
     details: {
       tools:
-        "Photoshop for panel/overlay raster work and non-destructive adjustments; Illustrator for crisp vector marks and scalable avatars. Smart Objects and export presets ensure platform-ready assets.",
+        "The system relies on Photoshop for non-destructive raster layering (panels, overlays) and Illustrator for vector avatar marks. Smart Objects hold core marks and panel headers, which enables rapid theme variants without re-rasterizing. Export presets target Twitch panels/banners at multiple scales to minimize blur.",
       design:
-        "Panel grids and strong typographic contrast maintain hierarchy at small sizes; texture adds energy while controlled values preserve legibility across light/dark Twitch themes.",
+        "A strict panel grid aligns labels, iconography, and spacing so each unit reads at a glance. Strong type contrast (weight + size + value) separates headers from descriptive text. Textures are intentionally subtle and live below type value so micro-contrast is preserved even after platform compression.",
       creativity:
-        "An ‘edgy’ brand tone expressed through digital-noise textures and angled motif lines; iterations explored stroke weight and contrast to retain clarity in tiny UI contexts.",
+        "The edgy tone is expressed through angled accent slashes and a restrained noise field that adds grit without distracting from informational content. Several iterations compared stroke weight around the avatar to balance presence against dense panel content.",
       critique:
-        "After peer critique, increased stroke contrast and simplified micro-text on panels improved readability on stream. Alignment issues were corrected against a modular grid.",
+        "Peer feedback revealed panel label shimmer at 100% scaling on some displays. We increased stroke contrast, nudged letterspacing, and normalized layer stacking order to reduce aliasing. A second QA pass focused on color values in dark mode to avoid low-contrast traps.",
       directions:
-        "Followed Twitch image specs for banners, avatars, panels, and overlay regions; exports tested on multiple device pixel ratios and window scales.",
+        "All assets adhere to Twitch banner/panel templates and allow safe cropping on variable aspect ratios. Deliverables include a README describing recommended OBS setups and replacement flows so the client can update panels independently.",
       craftsmanship:
-        "Type snap-to-pixel and consistent spacing across panels; color and sharpening tuned for compression. Assets organized and named for client reuse."
+        "Text layers snap to pixel to prevent blur; panel padding and icon spacing are consistent across the kit. Sharpening is applied at output size, and a final noise micro-layer prevents smooth gradient banding on stream."
     }
   },
 
@@ -73,19 +147,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Royalty-free textures and custom brushes for consistency."
     ],
     cover: "/images/work/cosmic-rvy/cover.png",
+    coverPosition: "contain",
+    date: "2024-02",
+    year: 2024,
+    typography: {
+      family: "Orbitron",
+      weights: ["500", "700"],
+      sources: ["Google Fonts"],
+      notes:
+        "A geometric, sci-fi face complements the arcade motif. Wordmark tracking was iterated for avatar sizes; heavier weights are reserved for hero lockups while captions and secondary labels use the 500 weight to avoid glow spill."
+    },
+    palette: [
+      { name: "Neon Pink", hex: "#FF4D8D", rgb: "255,77,141", hsl: "337,100%,65%" },
+      { name: "Cosmic Blue", hex: "#3DA9FC", rgb: "61,169,252", hsl: "205,97%,61%" },
+      { name: "Starfield Black", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
+      { name: "Nebula Glow", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" }
+    ],
+    process: [
+      { label: "Moodboard & References", date: "2024-01-05", note: "Synthesized 80s arcade + cosmic motifs; scoped color energy and UX readability." },
+      { label: "Logo Vectorization", date: "2024-01-12", note: "Refined path joins and letterforms for crisp scaling." },
+      { label: "Template Suite", date: "2024-01-20", note: "Established banner/post/story variants with consistent margins." },
+      { label: "Texture & Glow Pass", date: "2024-01-27", note: "Added glow halos with controlled values to reduce caption washout." },
+      { label: "Handoff", date: "2024-02-02", note: "Packaged vectors, textures, and editable PSDs with usage notes." }
+    ],
     details: {
       tools:
-        "Illustrator for primary mark construction, geometric cleanup, and kerning tests; Photoshop for texture finishing and social template production.",
+        "Illustrator handled mark construction and kerning tests; master outlines enable robust scaling without hinting artifacts. Photoshop contributed grain overlays, star fields, and glow treatment using layer styles and masked gradients for value control.",
       design:
-        "High-saturation neon palette balanced with generous negative space; letter-spacing and stroke weights tuned for avatar sizes; consistent logo area-of-isolation across layouts.",
+        "Neon intensity is tempered by generous negative space to keep focus on letterforms. A constrained glow radius and dark field underpin legibility, and a system of margins ensures consistent safe areas across templates.",
       creativity:
-        "Arcade/cosmic references used tastefully—glow effects and star-field textures provide vibe without obscuring type or symbol forms.",
+        "The visual language channels arcade nostalgia without leaning on cliché: subtle star streaks and restrained chroma help the identity feel lively but contemporary. Iterations dialed in glow color to avoid pink/blue clipping.",
       critique:
-        "Tracking refined on wordmark after review; over-glow reduced to pull back values and preserve midtone detail.",
+        "Early tests revealed overglow washing out caption text; lowering halo opacity and tightening letter-spacing resolved the issue. The avatar mark gained a slightly thicker outline to survive tiny render sizes.",
       directions:
-        "Exported in required aspect ratios and sizes for banners/avatars; ensured accessibility contrast on text overlays.",
+        "Platform dimensions were baked into the templates. Each output includes notes on export scales and a preflight checklist to prevent compression artifacts on upload.",
       craftsmanship:
-        "Vector paths cleaned to avoid rendering bumps; texture grain applied at print-safe and screen-safe frequencies."
+        "Vector seams were cleaned to prevent hairline antialiasing. Texture grain uses a frequency that resists moiré on downscaling, with final outputs sharpened for the destination pixel density."
     }
   },
 
@@ -103,19 +200,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Clean rasterization and consistent spacing for readability."
     ],
     cover: "/images/work/elite-ak/cover.png",
+    coverPosition: "contain",
+    date: "2024-01",
+    year: 2024,
+    typography: {
+      family: "Anton",
+      weights: ["400"],
+      sources: ["Google Fonts"],
+      notes:
+        "Anton’s condensed forms concentrate visual weight, allowing large, high-impact titles without overwhelming the render. Micro-tracking adjustments preserve counters and reduce haloing on glow edges."
+    },
+    palette: [
+      { name: "Depth Black", hex: "#121212", rgb: "18,18,18", hsl: "0,0%,7%" },
+      { name: "Steel Gray", hex: "#2A2A2A", rgb: "42,42,42", hsl: "0,0%,16%" },
+      { name: "Highlight Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
+      { name: "Status White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+    ],
+    process: [
+      { label: "Brief & Asset Prep", date: "2023-12-10", note: "Collected renders; normalized lighting and perspective." },
+      { label: "Composition Studies", date: "2023-12-15", note: "Balanced weapon silhouette vs. text block weight." },
+      { label: "Lighting & Atmosphere", date: "2023-12-18", note: "Spotlight and rim-light passes to create focus." },
+      { label: "Hierarchy Refinement", date: "2023-12-21", note: "Re-ordered title/CTA; tuned paddings for instant scan." },
+      { label: "Output QA", date: "2024-01-02", note: "Checked social crops; sharpened per-size." }
+    ],
     details: {
       tools:
-        "Photoshop for compositing, light/shadow painting, and type; Illustrator for any vector iconography used in CTA and logo lockups.",
+        "Photoshop masks and blend-if settings drive believable compositing. Adjustment layers harmonize the render palette, and Illustrator supplies clean vector icons for CTAs and sponsor marks.",
       design:
-        "Spotlight emphasis and centered composition create immediate focus; clear information hierarchy separates title, prize, and call-to-action.",
+        "A central spotlight carves a focal cone, keeping the viewer’s gaze on the weapon and title. Hierarchy is crystalized by scale, boldness, and a darker supporting field behind key text.",
       creativity:
-        "Iterated on depth via rim lights and atmosphere; subtle particle overlays add motion without degrading text clarity.",
+        "To differentiate from typical giveaway tropes, subtle atmospheric dust and controlled bloom add drama without clutter. The render angle was tuned so the silhouette remains unmistakable at a glance.",
       critique:
-        "CTA size/padding increased per critique; weapon angle adjusted for better silhouette and brand/logo alignment.",
+        "Feedback indicated the CTA blended too closely with the weapon highlights. We increased padding, introduced a slightly darker plate, and shifted the hue to separate layers in value.",
       directions:
-        "Social-safe dimensions and margins applied; layers organized for rapid versioning and platform-specific crops.",
+        "All exports follow platform aspect ratios and allow margin for captions/metadata overlays. File layers remain labeled and grouped for future re-skins.",
       craftsmanship:
-        "Sharpening applied on a stamped layer post-scale; halos and clipping refined to avoid banding and edge fringing."
+        "Edges are hand-refined to avoid fringing. A gentle, output-size sharpening pass prevents halos, and gradient banding is mitigated via low-amplitude noise."
     }
   },
 
@@ -133,19 +253,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "300 DPI export normalized for on-screen clarity."
     ],
     cover: "/images/work/pit-viper/cover.png",
+    coverPosition: "cover",
+    date: "2024-01",
+    year: 2024,
+    typography: {
+      family: "Oswald",
+      weights: ["600", "700"],
+      sources: ["Google Fonts"],
+      notes:
+        "A condensed grotesk with squared counters that holds up under angle and motion lines. Upper weights maintain integrity when composited over gradient fields and particle layers."
+    },
+    palette: [
+      { name: "Night Field", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
+      { name: "Viper Green", hex: "#98FF98", rgb: "152,255,152", hsl: "120,100%,80%" },
+      { name: "Warning Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
+      { name: "Highlight White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+    ],
+    process: [
+      { label: "Axis & Angle", date: "2023-12-08", note: "Established a 12–15° diagonal for motion language." },
+      { label: "Compositing", date: "2023-12-12", note: "Blended masked weapon over gradient-mapped background." },
+      { label: "Type & Plate", date: "2023-12-15", note: "Added darker plate behind title to prevent washout." },
+      { label: "Texture Controls", date: "2023-12-18", note: "Reduced grain where it interfered with counters." },
+      { label: "Export & Checks", date: "2023-12-20", note: "Verified crop safety; applied tailored sharpening." }
+    ],
     details: {
       tools:
-        "Photoshop compositing with masked renders, directional blur accents, and gradient mapping to unify palette.",
+        "Photoshop drives the entire workflow: channel masks for clean extractions, gradient maps to unify renders, and motion/particle layers to imply speed without noise buildup.",
       design:
-        "Diagonal axis implies speed; heavy display type sits on darker value field for immediate recognition; depth guided by layered gradients and shadow falloff.",
+        "The diagonal composition creates forward momentum, with weighty display type pinning the layout. Value stacks are managed so the title reads first, then the weapon, then secondary info.",
       creativity:
-        "Leans into high-drama esports language—angled bars and particle noise express intensity without sacrificing legibility.",
+        "Particle streams and thin angle bars are used sparingly to prevent visual fatigue. The color story leans into neon green as a high-energy accent balanced by a grounded black field.",
       critique:
-        "Deepened shadows and simplified background texture per critique to improve focus on the weapon and title.",
+        "Reviewers flagged an early version where grain clashed with counters; we reduced amplitude and pulled back the midtone. Type spacing was opened slightly to keep clarity at small feed sizes.",
       directions:
-        "Checked safe areas for platform crops; optimized exports for feed compression and varying pixel densities.",
+        "Templates were validated against platform guidelines; a notes file explains how to update renders and maintain motion axis alignment.",
       craftsmanship:
-        "Edge halos removed via careful blend modes; noise added to prevent gradient banding."
+        "Edges are feather-tuned to avoid halos. Gradients include low-amplitude noise to suppress banding, and export sharpening differs for 1x vs. 2x to avoid over-crisping."
     }
   },
 
@@ -163,19 +306,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Vector clarity and print-fidelity mockups."
     ],
     cover: "/images/work/awoke/cover.png",
+    coverPosition: "contain",
+    date: "2023-11",
+    year: 2023,
+    typography: {
+      family: "Eurostile",
+      weights: ["700"],
+      sources: ["Local @font-face"],
+      notes:
+        "A square-grotesk with techno overtones that complements the perspective mark. Kerning and optical alignments were refined at large sizes to keep the logotype from visually tilting."
+    },
+    palette: [
+      { name: "Esports Red", hex: "#FF2D2D", rgb: "255,45,45", hsl: "0,100%,59%" },
+      { name: "Cool Blue", hex: "#2D8CFF", rgb: "45,140,255", hsl: "212,100%,59%" },
+      { name: "Depth Black", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
+      { name: "Highlight White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+    ],
+    process: [
+      { label: "Brief & Attributes", date: "2023-10-20", note: "Defined traits: fast, competitive, premium—not edgy for edge’s sake." },
+      { label: "Perspective Sketches", date: "2023-10-25", note: "Explored foreshortening without readability loss." },
+      { label: "Vector Cleanup", date: "2023-10-28", note: "Corrected joins; normalized inner angles to prevent dark spots." },
+      { label: "Color & Mockups", date: "2023-11-02", note: "Dialed red/blue balance; tested on apparel, web, and signage." },
+      { label: "Specs & Handoff", date: "2023-11-06", note: "Clear space, minimum size, and color variants documented." }
+    ],
     details: {
       tools:
-        "Illustrator used for geometric construction and perspective cleanup; Photoshop for context mockups and print simulations.",
+        "Illustrator supported precise grid construction and perspective alignment; Photoshop aided in realistic mockups for social, apparel, and signage contexts.",
       design:
-        "Balance of warm/cool palette provides energy; negative space shapes define motion; strict grid usage yields consistent placements across sizes.",
+        "Negative space carves directional motion within the mark; opposing red/blue balance injects energy without creating chromatic vibration. Grid adherence ensures the shape reproduces cleanly across sizes.",
       creativity:
-        "Dimensional rendering suggests speed and competitiveness while preserving a simple, reproducible shape language.",
+        "Rather than relying on aggressive spikes, dimensionality and implied speed communicate the esports vibe. The geometry opts for repeatable forms that scale down gracefully.",
       critique:
-        "Micro-adjusted perspective and stroke joins based on feedback; small-shape noise reduced to avoid shimmer at distance.",
+        "Perspective edges originally created dark congestion at certain angles—adjustments to inner joins and line terminals resolved the issue. Color balance shifted to prevent the blue from overpowering red at small sizes.",
       directions:
-        "Color palette and clear-space rules documented; exports prepared for print and digital with spot/color variants.",
+        "Brand specs include clear-space rules, minimum sizes, and color/usage variants. Assets are delivered in vector and raster, with spot-color versions for print.",
       craftsmanship:
-        "Vector joins cleaned; logo tested against dark/light backgrounds and on textured environments."
+        "Anchor points are minimized and distributed to avoid bumps on tight curves. The logo is tested over textured and flat backgrounds to ensure consistent edge quality."
     }
   },
 
@@ -193,19 +359,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Dimensions/exports follow Twitter branding specs."
     ],
     cover: "/images/work/obsidian/cover.png",
+    coverPosition: "top", // ensures the banner top is visible in the overlay
+    date: "2023-10",
+    year: 2023,
+    typography: {
+      family: "Inter",
+      weights: ["600", "800"],
+      sources: ["Google Fonts"],
+      notes:
+        "Inter’s clean geometry remains crisp in header crops. The slogan uses a lighter weight than the name to preserve hierarchy, and subtle tracking prevents dark massing around the monogram."
+    },
+    palette: [
+      { name: "Obsidian", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
+      { name: "Slate", hex: "#222222", rgb: "34,34,34", hsl: "0,0%,13%" },
+      { name: "Accent", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
+      { name: "Glitch White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+    ],
+    process: [
+      { label: "Brief & Crop Safety", date: "2023-09-22", note: "Mapped desktop vs. mobile header crops to reserve safe zones." },
+      { label: "Monogram Exploration", date: "2023-09-25", note: "Integrated O/T with a subtle S curve inside the negative space." },
+      { label: "Texture Pass", date: "2023-09-28", note: "Glitch field tuned to avoid distracting banding behind type." },
+      { label: "Contrast Plate", date: "2023-10-01", note: "Introduced faint plate to separate mark from background." },
+      { label: "Export & Verification", date: "2023-10-03", note: "Checked rendering at multiple viewport widths and themes." }
+    ],
     details: {
       tools:
-        "Photoshop for header template, glitch texture and color tuning; Illustrator for monogram vector and alignment testing. Smart Objects used for quick iteration.",
+        "Photoshop’s template guided the safe zones while Illustrator handled the crisp monogram. Smart Objects enable quick color tweaks and export at various aspect scenarios.",
       design:
-        "Symmetric layout provides balance; value plate behind monogram raises contrast; controlled texture adds rhythm without harming readability.",
+        "A symmetric layout yields perceived stability. The value plate behind the monogram boosts contrast, and the glitch texture is constrained in amplitude so text remains legible.",
       creativity:
-        "O/T monogram with subtle S curve fuses identity; glitch field nods to gaming/tech while remaining restrained.",
+        "The monogram solves a three-letter puzzle without looking contrived, and the background motion suggests a digital personality without devolving into noise.",
       critique:
-        "Introduced a faint opaque plate to improve mark separation; adjusted slogan weight to sit below the name in hierarchy.",
+        "Feedback indicated the slogan competed with the name; the hierarchy was corrected by reducing its weight and adding more spacing. The plate opacity was also tuned down to avoid looking like a solid box.",
       directions:
-        "Sized and exported per Twitter/X header specs; checked mobile/desktop crops for critical content safety.",
+        "Exports follow Twitter/X specs with attention to center-safe content. Notes recommend double-checking device previews, as the platform’s crop can shift.",
       craftsmanship:
-        "Alignment verified against grid; edges anti-aliased cleanly; glow/texture kept within value bounds to avoid bleed."
+        "Edges stay smooth across background variance; all glow and grain pass thresholds that resist dithering and color banding after upload compression."
     }
   },
 
@@ -223,19 +412,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Pixel-snapped icons; a11y-minded contrast and spacing."
     ],
     cover: "/images/work/format-guide/cover.png",
+    coverPosition: "contain",
+    date: "2023-09",
+    year: 2023,
+    typography: {
+      family: "Source Sans 3",
+      weights: ["400", "600"],
+      sources: ["Google Fonts"],
+      notes:
+        "A humanist sans chosen for clear paragraph differentiation and approachable tone. Paragraph/character styles enforce hierarchy while keeping callouts discoverable in long-form reading."
+    },
+    palette: [
+      { name: "Paper", hex: "#F7EFE5", rgb: "247,239,229", hsl: "33,56%,93%" },
+      { name: "Ink", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
+      { name: "Link Blue", hex: "#3DA9FC", rgb: "61,169,252", hsl: "205,97%,61%" },
+      { name: "Accent Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" }
+    ],
+    process: [
+      { label: "Outline & Grid", date: "2023-08-28", note: "Established 12-col grid and typographic rhythm." },
+      { label: "Icon Set Design", date: "2023-09-01", note: "Vector icons aligned to pixel grid for clarity at small sizes." },
+      { label: "Interactive Layers", date: "2023-09-04", note: "Added hyperlinks, anchors, and bookmarks for navigation." },
+      { label: "A11y Pass", date: "2023-09-06", note: "Contrast checks and logical reading order validated." },
+      { label: "Export Packages", date: "2023-09-08", note: "Produced interactive PDF and print-safe variants with embedded assets." }
+    ],
     details: {
       tools:
-        "Illustrator for icon set; InDesign for paragraph/character styles, anchored objects, TOC, and hyperlinking; exported interactive PDF for web and print-ready variant.",
+        "Illustrator produced the iconography with consistent stroke/shape logic. InDesign anchored the icons, drove styles, and exported both interactive and print variants with proper preflight.",
       design:
-        "Consistent typographic scale and spacing establish hierarchy; icon repetition aids pattern recognition; color and contrast tuned for readability.",
+        "The grid and consistent paragraph scale keep dense information skimmable. Link color and icon repetition establish recognizable patterns without overwhelming the reader.",
       creativity:
-        "Icons customized to the brand; tone aimed at non-design clients to demystify file types and appropriate usage.",
+        "Icons were tailored to the brand voice rather than stock symbols, striking a balance between clarity and character. Micro-illustrations support the message without feeling ornamental.",
       critique:
-        "Converted to interactive PDF per critique so examples link directly to resources; improved layout rhythm between sections.",
+        "Feedback requested quicker scannability; we added jump links and a sticky contents section. Icon stroke weight was tweaked for balance against headings.",
       directions:
-        "Meets deliverable requirements for both print and screen; file packages include fonts/links and outlined/embedded-safe variants.",
+        "The guide respects both screen and print contexts. File packages include fonts/links and an instructions page for client-side updates.",
       craftsmanship:
-        "Icons pixel-snapped; margins and gutters normalized; contrast checked for accessibility; link targets validated."
+        "Icons snap to the pixel grid; tables and callouts align to baseline. Exported PDFs retain crisp vector rendering and pass link validation."
     }
   },
 
@@ -253,19 +465,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Print-ready specs for letterhead, envelope, and cards."
     ],
     cover: "/images/work/upper-crust/cover.png",
+    coverPosition: "contain",
+    date: "2023-08",
+    year: 2023,
+    typography: {
+      family: "Cormorant Garamond",
+      weights: ["500", "700"],
+      sources: ["Google Fonts"],
+      notes:
+        "A refined serif with classical proportions reinforces the premium, heritage tone. Tight wordmarks are balanced with generous line spacing in body copy to maintain readability."
+    },
+    palette: [
+      { name: "Burgundy", hex: "#7B1E24", rgb: "123,30,36", hsl: "356,61%,30%" },
+      { name: "Gold", hex: "#C59A3C", rgb: "197,154,60", hsl: "42,55%,50%" },
+      { name: "Cream", hex: "#F7EFE5", rgb: "247,239,229", hsl: "33,56%,93%" },
+      { name: "Ink", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" }
+    ],
+    process: [
+      { label: "Brand Positioning", date: "2023-07-20", note: "Defined modern-meets-heritage positioning and target audience." },
+      { label: "Icon Sketches", date: "2023-07-24", note: "Iterated madeline forms; tested for silhouette clarity." },
+      { label: "Vector Mark", date: "2023-07-27", note: "Refined curves, avoided tangents, established clear space." },
+      { label: "Collateral System", date: "2023-07-30", note: "Letterhead, envelope, and cards on a shared grid." },
+      { label: "Print Package", date: "2023-08-03", note: "CMYK profiles, bleeds, and paper recommendations included." }
+    ],
     details: {
       tools:
-        "Illustrator for the mark and variants; InDesign for multi-page layout templates, paragraph styles, and print packaging.",
+        "Illustrator handled mark construction and variants; InDesign set up reusable layout templates and print packaging with proper preflight.",
       design:
-        "Madeline-inspired icon paired with refined serif; burgundy/gold/cream CMYK palette signals premium, heritage cues; grid-led spacing ensures unity across pieces.",
+        "The mark and palette lean premium without cliché. A restrained typographic system establishes hierarchy, while whitespace and alignment provide calm, confident rhythm across collateral.",
       creativity:
-        "Cultural nod expressed through icon form and palette while maintaining modern restraint suitable for a premium bakery brand.",
+        "The pastry-inspired symbol bridges cultural reference and modern geometry. Pairing it with a contemporary grid keeps the identity from veering into nostalgia.",
       critique:
-        "Adjusted pillar alignment and type spacing per feedback to tighten rhythm and improve optical balance.",
+        "Spacing adjustments around the icon reduced visual tension in the wordmark. Color relationships were tuned to avoid muddiness on uncoated stock.",
       directions:
-        "Delivered print-ready with bleeds, slug, and color profiles; provided stationery sizes and safe-area rules.",
+        "Clear usage specs and file variants were delivered for emboss, foil, and standard print. Documentation notes how to maintain contrast on different substrates.",
       craftsmanship:
-        "Vector edges cleaned; proofed CMYK values; consistent logo placement and typographic hierarchy across collateral."
+        "Curves are tangent-clean, with consistent stroke logic. Mockups match real print scale, ensuring logo legibility and ink density are predictable."
     }
   },
 
@@ -283,19 +518,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Layer structure organized for fast reuse."
     ],
     cover: "/images/work/sopamanxx/cover.png",
+    coverPosition: "cover",
+    date: "2024-01",
+    year: 2024,
+    typography: {
+      family: "Bebas Neue",
+      weights: ["400"],
+      sources: ["Google Fonts"],
+      notes:
+        "A condensed display face with generous caps that remains legible at tiny sizes. Slightly increased tracking and a black plate ensure counters hold up against busy renders."
+    },
+    palette: [
+      { name: "Plate Black", hex: "#000000", rgb: "0,0,0", hsl: "0,0%,0%" },
+      { name: "Highlight White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" },
+      { name: "Accent Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
+      { name: "Feed Gray", hex: "#222222", rgb: "34,34,34", hsl: "0,0%,13%" }
+    ],
+    process: [
+      { label: "Brief & Hook", date: "2023-12-28", note: "Clarified content hook and title length for mobile." },
+      { label: "Layout Axis", date: "2023-12-30", note: "Established diagonal flow for energy and hierarchy." },
+      { label: "Lighting Pass", date: "2024-01-02", note: "Painted rim lights and glow accents to separate subject from background." },
+      { label: "Title Plate", date: "2024-01-03", note: "Introduced black plate and tuned spacing for small-screen legibility." },
+      { label: "Export & QA", date: "2024-01-04", note: "Checked 25–35% scaled mocks to simulate phone feed." }
+    ],
     details: {
       tools:
-        "Photoshop groups and Smart Objects for re-skinning titles/renders; adjustment layers for unified palette; sharpening tailored for 72-dpi outputs.",
+        "Photoshop groups are structured for quick re-skinning of titles and renders. Adjustment layers provide color consistency; a sharpen-on-output action avoids double sharpening during scaling.",
       design:
-        "Diagonal flow increases energy; heavy title weight and black plate preserve legibility on small/mobile; foreground/background separation guided by value structure.",
+        "Hierarchy leads with the title block, supported by a black plate to guarantee contrast. Diagonal alignment and selective glow direct the eye without busying the frame.",
       creativity:
-        "Bold lighting and glitch accents reflect creator personality while remaining readable at feed scale.",
+        "The treatment borrows from cinematic key art but remains practical for weekly content churn. Dramatic lighting adds personality while staying readable at thumbnail size.",
       critique:
-        "Added black underlay and increased letterspacing based on feedback; tested at reduced sizes to confirm readability.",
+        "Initial type thickness caused dark clumping; tracking was opened and weight reduced slightly. Saturation on the rim light was pulled back to prevent clipping.",
       directions:
-        "Built at 1280×720 with safe margins; exports verified against YouTube compression and theme backgrounds.",
+        "Template notes specify minimum title size and safe margins. Export settings are included to align with YouTube’s compression behavior.",
       craftsmanship:
-        "Layer naming and color coding aid reuse; final sharpen applied post-scale to avoid halos."
+        "Layer naming and color coding make future iterations fast. The sharpen-last workflow prevents halos, and subtle noise keeps gradients smooth."
     }
   },
 
@@ -313,19 +571,42 @@ export const WORK_META: Record<string, WorkMeta> = {
       "Print-ready: embedded fonts/outline-safe vectors."
     ],
     cover: "/images/work/depresso/cover.png",
+    coverPosition: "contain",
+    date: "2023-07",
+    year: 2023,
+    typography: {
+      family: "Cooper Black",
+      weights: ["700"],
+      sources: ["Local @font-face"],
+      notes:
+        "A friendly, heavy serif suits the comedic tone and anchors the composition. Title scale is disciplined to avoid crowding expressive graphics; subcopy uses lighter tracking to prevent blockiness."
+    },
+    palette: [
+      { name: "Coffee", hex: "#3B2F2F", rgb: "59,47,47", hsl: "0,12%,21%" },
+      { name: "Cream", hex: "#F1E3C6", rgb: "241,227,198", hsl: "38,58%,86%" },
+      { name: "Ink", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
+      { name: "Warm Accent", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" }
+    ],
+    process: [
+      { label: "Concept & Wordplay", date: "2023-06-15", note: "Sketched visual puns; chose expressive character angle." },
+      { label: "Vector Pass", date: "2023-06-18", note: "Constructed cups and faces with consistent stroke logic." },
+      { label: "Type & Rhythm", date: "2023-06-20", note: "Balanced title scale with whitespace to create pacing." },
+      { label: "Texture & Print Prep", date: "2023-06-22", note: "Applied subtle 300-dpi texture and set bleed/margins." },
+      { label: "Proof & Final", date: "2023-06-25", note: "Color-checked on coated/uncoated; exported press-ready." }
+    ],
     details: {
       tools:
-        "Illustrator vectors for cups and typography; Photoshop texture overlays and print export at 300 dpi with proper bleed/margins.",
+        "Illustrator handled clean, reusable vectors; Photoshop added paper-like grain at print resolution. Files are organized for color editing with embedded/outlined options for service bureaus.",
       design:
-        "Title scale and contrast drive hierarchy; expressive faces and controlled whitespace set rhythm; repeating forms provide unity and variety.",
+        "Contrast in scale and value drives the gag while whitespace frames the action. Repetition of cups establishes pattern harmony, with subtle texture preventing a flat, clip-art feel.",
       creativity:
-        "Humorous concept realized with character-driven cup designs; texture adds warmth without muddying type.",
+        "The humor reads even without copy thanks to expressive vector faces. The palette references café warmth without drifting into sepia kitsch.",
       critique:
-        "Adjusted cup scale and face opacity after critique to balance weight and improve focus on the title.",
+        "Test prints revealed a crowding issue near the title; spacing and face opacities were tuned for clearer emphasis. Minor curve smoothing removed distracting kinks.",
       directions:
-        "Prepared social and print variants with appropriate color management and file handling (embedded/outlined fonts as needed).",
+        "Deliverables include social crops and a print-ready PDF/X-1a. Documentation notes how to convert the file for screen-only usage with lighter grain.",
       craftsmanship:
-        "Edges stay crisp at print size; spacing adheres to grid; texture frequency tuned to avoid moiré and banding."
+        "All curves are tangent-clean and corner alignment is precise. Texture frequency avoids moiré; typography retains clarity at print sizes."
     }
   }
 };

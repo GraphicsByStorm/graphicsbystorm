@@ -1,165 +1,201 @@
 ---
+import type { Service, Tier } from '$lib/data/services';
 import { SERVICES, $$fmtRange, $$fmtUSD, PRICING_NOTES } from '$lib/data/services';
 
 const cta = { text: 'Start a project', href: '/#contact' };
 const altCta = { text: 'Premade work → Shop', href: '/shop' };
----
 
+/** Merge + dedupe tier deliverables, keep it concise for the filmstrip */
+function coreDeliverables(svc: Service, limit = 6): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  (svc.tiers ?? []).forEach((t) => {
+    (t.deliverables ?? []).forEach((d) => {
+      const key = d.trim().toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        out.push(d.trim());
+      }
+    });
+  });
+  return out.slice(0, limit);
+}
+---
 <section id="services" class="section bg-[var(--surface-0,#0a0a0a)]">
   <div class="mx-auto max-w-6xl px-4 py-12 sm:py-14 lg:py-16">
+    <!-- Header (contained) -->
     <div class="mb-6 flex items-center justify-between gap-3">
       <h2 class="text-[clamp(1.35rem,2.2vw,1.75rem)] font-extrabold tracking-tight text-white">
-        <span class="mr-2 inline-block h-3 w-1.5 translate-y-[2px] rounded-full"
-              style="background: var(--color-brand-500,#E2A028);"></span>
+        <span
+          class="mr-2 inline-block h-3 w-1.5 translate-y-[2px]"
+          style="background: var(--color-brand-500,#E2A028);"
+        ></span>
         Services & Pricing
       </h2>
 
       <div class="flex gap-2">
-        <a href={cta.href}
-           class="inline-flex items-center rounded-md bg-[var(--color-brand-500,#E2A028)] px-3.5 py-2 text-[13px] font-semibold text-black shadow hover:opacity-90">
+        <a
+          href={cta.href}
+          class="inline-flex items-center bg-[var(--color-brand-500,#E2A028)] px-3.5 py-2 text-[13px] font-semibold text-black shadow hover:opacity-90"
+        >
           {cta.text}
         </a>
-        <a href={altCta.href}
-           class="inline-flex items-center rounded-md border border-white/10 bg-white/[.05] px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-white/[.1]">
+        <a
+          href={altCta.href}
+          class="inline-flex items-center border border-white/10 bg-white/[.05] px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-white/[.1]"
+        >
           {altCta.text}
         </a>
       </div>
     </div>
+  </div>
 
-    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {SERVICES.map((svc) => {
-        const startAt = svc.tiers?.[0]?.price?.min ?? svc.typicalRange.min;
-        return (
-          <article class="svc-card">
-            <div class="svc-accent" />
-            <h3 class="svc-title">{svc.title}</h3>
-            <p class="svc-blurb line-clamp-2">{svc.blurb}</p>
+  <!-- Full-bleed filmstrip (edge-to-edge; clears left rail / social bar) -->
+  <div class="svc-bleed" style="--svc-left-rail: var(--left-rail, 64px);">
+    {SERVICES.map((svc: Service) => {
+      const startAt = svc.tiers?.[0]?.price?.min ?? svc.typicalRange.min;
+      const contactHref = `${cta.href}?service=${encodeURIComponent(svc.title)}`;
+      const bullets = coreDeliverables(svc);
 
-            <div class="mt-1.5 flex items-center gap-2">
-              <span class="price-pill">From {$$fmtUSD(startAt)}</span>
-              <span class="price-range">Typical: {$$fmtRange(svc.typicalRange)}</span>
+      return (
+        <article
+          class="group relative isolate w-[100vw] overflow-hidden border-b border-white/10 bg-black/30 transition-colors hover:bg-black/40 focus-within:bg-black/40"
+        >
+          <!-- Row (height expands on hover/focus-within) -->
+          <div class="svc-row pointer-events-none relative flex items-center gap-3">
+            <!-- left brand tick -->
+            <div
+              class="mr-2 inline-block h-3 w-1.5"
+              style="background: var(--color-brand-500,#E2A028);"
+            ></div>
+
+            <!-- Title + meta -->
+            <div class="min-w-0 flex-1">
+              <h3 class="truncate text-[13px] sm:text-[14px] font-extrabold tracking-tight text-white">
+                {svc.title}
+              </h3>
+
+              <div class="mt-1 flex flex-wrap items-center gap-1.5 text-white/85">
+                <span class="pill-strong">From {$$fmtUSD(startAt)}</span>
+                <span class="pill-weak">Typical: {$$fmtRange(svc.typicalRange)}</span>
+
+                {svc.tiers?.slice(0, 2).map((t: Tier) => (
+                  <span class="pill-tier">
+                    <span class="font-semibold">{t.name}</span>
+                    <span class="opacity-80"> · ~{t.timeline}</span>
+                  </span>
+                ))}
+              </div>
+
+              <!-- One-line blurb -->
+              <p class="mt-1 line-clamp-1 text-[12px] text-white/75 transition-opacity duration-200 group-hover:opacity-90">
+                {svc.blurb}
+              </p>
+
+              <!-- Expanded details (deliverables) -->
+              {bullets.length > 0 && (
+                <div class="svc-details mt-2">
+                  <ul class="list-disc pl-5 text-[12px] text-white/85 space-y-0.5">
+                    {bullets.map((d: string) => <li>{d}</li>)}
+                  </ul>
+                </div>
+              )}
             </div>
 
-            {svc.tiers?.length ? (
-              <ul class="mt-2 space-y-1.5">
-                {svc.tiers.slice(0, 2).map((t) => (
-                  <li class="tier">
-                    <div class="tier-head">
-                      <span class="tier-name">{t.name}</span>
-                      <span class="tier-price">{$$fmtRange(t.price)}</span>
-                    </div>
-                    <div class="tier-meta">~ {t.timeline}</div>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-
-            <a href={`${cta.href}?service=${encodeURIComponent(svc.title)}`} class="svc-cta">
+            <!-- Right affordance -->
+            <div
+              class="pointer-events-none absolute right-[1rem] top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[var(--color-brand-500,#E2A028)] underline underline-offset-4 decoration-[var(--color-brand-500,#E2A028)] opacity-0 translate-x-1 transition duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-0"
+            >
               Get a precise quote →
-            </a>
-          </article>
-        );
-      })}
-    </div>
+            </div>
+          </div>
 
+          <!-- Full-row link (keyboard focus drives expand via :focus-within) -->
+          <a
+            href={contactHref}
+            class="absolute inset-0"
+            aria-label={`Contact about ${svc.title}`}
+          />
+        </article>
+      );
+    })}
+  </div>
+
+  <!-- Notes (contained) -->
+  <div class="mx-auto max-w-6xl px-4">
     <ul class="mt-5 list-disc space-y-1 pl-5 text-xs text-neutral-400">
-      {PRICING_NOTES.map((n) => <li>{n}</li>)}
+      {PRICING_NOTES.map((n: string) => <li>{n}</li>)}
     </ul>
   </div>
 </section>
 
 <style>
-  .svc-card {
+  /* Full-bleed helper: extend inner block to viewport width */
+  .svc-bleed {
     position: relative;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,.08);
-    background: rgba(255,255,255,.04);
-    padding: .8rem .75rem .85rem;
-    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+  }
+
+  /* Filmstrip row height + transition (no JS) */
+  .svc-row {
+    /* edge-to-edge padding with left-rail clearance */
+    padding-left: calc(var(--svc-left-rail, 64px) + 1rem);
+    padding-right: 1rem;
+
+    height: 120px;
+    transition: height .25s ease, padding .25s ease;
     display: flex;
-    flex-direction: column;
-    gap: .3rem;
+    align-items: center;
   }
-  .svc-card:hover {
-    transform: translateY(-1px);
-    background: rgba(255,255,255,.055);
-    box-shadow: 0 8px 20px rgba(0,0,0,.32);
-  }
-  .svc-accent {
-    position: absolute;
-    inset-inline: 0;
-    top: 0;
-    height: 3px;
-    border-top-left-radius: 14px;
-    border-top-right-radius: 14px;
-    background: linear-gradient(90deg,
-      color-mix(in oklab, var(--color-brand-500,#E2A028) 92%, #fff 8%),
-      var(--color-brand-500,#E2A028));
-  }
-  .svc-title {
-    color: #fff;
-    font-weight: 900;
-    letter-spacing: .2px;
-    font-size: .98rem;
-    margin-top: .3rem;
-  }
-  .svc-blurb {
-    color: rgba(230,230,230,.9);
-    font-size: .9rem;
-    line-height: 1.45;
-    margin-top: .1rem;
+  .group:hover .svc-row,
+  .group:focus-within .svc-row {
+    height: 320px;
   }
 
-  .price-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    padding: .2rem .45rem;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.1);
+  /* Pills (match Work filmstrip tone) */
+  .pill-strong {
+    display: inline-flex; align-items: center;
+    padding: .18rem .45rem;
+    border: 1px solid rgba(255,255,255,.12);
     background: color-mix(in oklab, var(--color-brand-500,#E2A028) 14%, transparent);
-    color: #fff;
-    font-weight: 800;
-    font-size: .8rem;
+    color: #fff; font-weight: 800; font-size: .78rem;
   }
-  .price-range {
-    color: #b9bec5;
-    font-size: .78rem;
+  .pill-weak {
+    display: inline-flex; align-items: center;
+    padding: .18rem .45rem;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    color: #dfe3e7; font-weight: 700; font-size: .76rem;
   }
-
-  .tier {
-    padding: .4rem .5rem;
+  .pill-tier {
+    display: inline-flex; align-items: center; gap: .25rem;
+    padding: .16rem .4rem;
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 10px;
-    background: rgba(255,255,255,.03);
+    background: rgba(255,255,255,.05);
+    color: #e8eaed; font-size: .74rem;
   }
-  .tier-head { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; }
-  .tier-name { color: #fff; font-weight: 800; font-size: .88rem; }
-  .tier-price { color: #dfe3e7; font-weight: 700; font-size: .86rem; }
-  .tier-meta { color: #9aa0a6; font-size: .76rem; margin-top: .1rem; }
 
-  .svc-cta {
-    margin-top: auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9px;
-    border: 1px solid rgba(255,255,255,.1);
-    background: rgba(255,255,255,.04);
-    color: #fff;
-    font-weight: 700;
-    font-size: .88rem;
-    padding: .45rem .6rem;
-    transition: background .12s ease, transform .08s ease;
-  }
-  .svc-cta:hover { background: rgba(255,255,255,.08); transform: translateY(-1px); }
-
-  /* Simple line clamp without plugin */
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;           /* vendor */
-    line-clamp: 2;                   /* standard */
-    -webkit-box-orient: vertical;
+  /* Expand/collapse deliverables smoothly */
+  .svc-details {
+    max-height: 0;
+    opacity: 0;
     overflow: hidden;
+    transition: max-height .28s ease, opacity .22s ease;
+  }
+  .group:hover .svc-details,
+  .group:focus-within .svc-details {
+    max-height: 320px; /* enough for ~6 bullets */
+    opacity: 1;
+  }
+
+  /* One-line clamp without plugin */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1; line-clamp: 1;
+    -webkit-box-orient: vertical; overflow: hidden;
   }
 </style>

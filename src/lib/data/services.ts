@@ -19,6 +19,10 @@ export type Service = {
   blurb: string;
   typicalRange: PriceRange; // headline/typical band
   tiers: Tier[];
+  /** Optional per-row accent color (CSS color). Falls back to var(--color-brand-500). */
+  accent?: string;
+  /** Full-bleed background images for the hover strip (first is default; second crossfades on hover) */
+  covers?: string[];
 };
 
 export const HOURLY_RATE = 30;   // ✅ your target
@@ -47,6 +51,11 @@ export const SERVICES: Service[] = [
     title: 'Branding',
     blurb: 'Identity systems with critique-driven polish and real-world consistency.',
     typicalRange: { min: 900, max: 15000 },
+    accent: 'var(--color-brand-500,#E2A028)',
+    covers: [
+      '/images/work/awoke/01.png',
+      '/images/work/upper-crust/02.png'
+    ],
     tiers: [
       {
         name: 'Starter',
@@ -89,6 +98,10 @@ export const SERVICES: Service[] = [
     title: 'Streaming Kits',
     blurb: 'Banners, avatars, overlays, panels—legible on Twitch at a glance.',
     typicalRange: { min: 300, max: 1800 },
+    covers: [
+      '/images/work/fritz/02.png',
+      '/images/work/fritz/06.png'
+    ],
     tiers: [
       {
         name: 'Essentials',
@@ -115,6 +128,10 @@ export const SERVICES: Service[] = [
     title: 'Social Media Kits',
     blurb: 'Reusable templates tuned for engagement and platform constraints.',
     typicalRange: { min: 360, max: 1800 },
+    covers: [
+      '/images/work/cosmic-rvy/02.png',
+      '/images/work/obsidian/02.png'
+    ],
     tiers: [
       {
         name: 'Starter',
@@ -141,6 +158,10 @@ export const SERVICES: Service[] = [
     title: 'Creative Ads',
     blurb: 'Conversion-minded compositions that read instantly in busy feeds.',
     typicalRange: { min: 120, max: 4200 },
+    covers: [
+      '/images/work/pit-viper/01.png',
+      '/images/work/elite-ak/01.png'
+    ],
     tiers: [
       {
         name: 'Single Concept',
@@ -167,6 +188,10 @@ export const SERVICES: Service[] = [
     title: 'Merch / Packaging',
     blurb: 'Die-line-aware designs with strong hierarchy and print-safe specs.',
     typicalRange: { min: 600, max: 6000 },
+    covers: [
+      '/images/work/upper-crust/06.png',
+      '/images/work/upper-crust/07.png'
+    ],
     tiers: [
       {
         name: 'Single SKU',
@@ -187,6 +212,10 @@ export const SERVICES: Service[] = [
     title: 'UI/UX Design',
     blurb: 'Clean, modern interfaces with a bold, gritty edge where it fits.',
     typicalRange: { min: 240, max: 18000 },
+    covers: [
+      '/images/work/format-guide/01.png',
+      '/images/work/format-guide/03.png'
+    ],
     tiers: [
       {
         name: 'Page Design',
@@ -213,6 +242,10 @@ export const SERVICES: Service[] = [
     title: 'YouTube Thumbnails',
     blurb: 'High-contrast, mobile-first thumbnails that win the click.',
     typicalRange: { min: 30, max: 720 },
+    covers: [
+      '/images/work/sopamanxx/01.png',
+      '/images/work/sopamanxx/02.png'
+    ],
     tiers: [
       {
         name: 'Single',
@@ -239,6 +272,10 @@ export const SERVICES: Service[] = [
     title: 'Full-stack Web',
     blurb: 'Svelte / SvelteKit / Astro / Tailwind / Prisma / Firebase—front to back.',
     typicalRange: { min: 1800, max: 66000 },
+    covers: [
+      '/images/work/format-guide/02.png',
+      '/images/work/format-guide/04.png'
+    ],
     tiers: [
       {
         name: 'Micro-site',
@@ -265,6 +302,10 @@ export const SERVICES: Service[] = [
     title: 'Video Editing',
     blurb: 'Music-synced gaming montages & professional edits for any content.',
     typicalRange: { min: 300, max: 4800 },
+    covers: [
+      '/images/work/sopamanxx/02.png',
+      '/images/work/awoke/01.png'
+    ],
     tiers: [
       {
         name: 'Montage (60–120s)',

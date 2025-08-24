@@ -13,44 +13,22 @@ import ContactSection from "$compSec/ContactSection.astro";
 import WorkSection from "$svelteSec/WorkSection.svelte";
 import ShopSection from "$svelteSec/ShopSection.svelte";
 
-// Data source (typed)
+// Data
 import { WORKS } from "$lib/data/work";
+import { WORK_META } from '$lib/data/workMeta';
 
-// Allow future transforms (e.g., sort, filter, slice)
-const workItems = Array.isArray(WORKS) ? WORKS : [];
-const hasWork = workItems.length > 0;
+const items = WORKS.map(w => ({ ...w, ...WORK_META[w.slug] }));
 ---
 
 <BaseLayout title="GraphicsByStorm">
-
   <HeroSection />
 
-  {hasWork ? (
-    // Hydrate when scrolled into view; switch to client:load if you need immediate interactivity
-    <WorkSection items={workItems} client:visible />
-  ) : (
-    // Safe fallback if WORK is empty during refactors/content changes
-    <section class="py-10">
-      <div class="mx-auto max-w-5xl px-4 text-neutral-400">
-        <h2 class="mb-2 text-xl font-semibold text-white">Selected Work</h2>
-        <p>Portfolio is being updated. Check back shortly.</p>
-      </div>
-    </section>
-  )}
+  {/* GUARANTEE hydration so clicks always bind */}
+  <WorkSection items={items} client:load />
 
   <AboutSection />
   <ServicesSection />
   <FAQSection />
-
-  {/* Shop is also a Svelte island—hydrate lazily for perf */}
   <ShopSection client:visible />
-
   <ContactSection />
 </BaseLayout>
-
-<!-- Optional: preconnects (keep minimal & only if you really use them) -->
-<!--
-<head>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-</head>
--->

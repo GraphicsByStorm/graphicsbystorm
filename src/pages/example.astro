@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '$layouts/BaseLayout.astro';
-import WorkSection from '$svelte/sections/WorkSection.svelte';
+import ExampleWork from '$svelte/ExampleWork.svelte';
+import ExampleSectionTitle from '$svelte/ExampleSectionTitle.svelte'
 import { WORKS } from '$lib/data/work';
 import { WORK_META } from '$lib/data/workMeta';
 
@@ -20,7 +21,10 @@ export const prerender = true;
 ---
 
 <BaseLayout title="Work • GraphicsByStorm" description="Selected work and case studies">
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <WorkSection {...workProps} client:visible />
+  <main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <ExampleSectionTitle />
   </main>
+  <section class="my-[-5rem]">
+    <ExampleWork {...workProps} client:visible />
+  </section>
 </BaseLayout>
