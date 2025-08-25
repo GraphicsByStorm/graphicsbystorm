@@ -5,11 +5,10 @@ import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  site: "https://graphicsbystorm.com", // <- set your domain (used for canonical + sitemap)
+  output: "static", // <- IMPORTANT: static build for Hostinger
+  trailingSlash: "ignore",
   integrations: [svelte()],
-  // Fully static build for Hostinger shared hosting
-  output: "static",
-  // If you know your final domain, add it (improves canonical URLs)
-  site: "https://graphicsbystorm.com",
   vite: {
     plugins: [tailwindcss()],
     resolve: {

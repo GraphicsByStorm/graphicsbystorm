@@ -1,16 +1,32 @@
 ---
 import ContactForm from "$svelte/components/ContactForm.svelte";
-export const prerender = true;
-
-// Optional: customize copy for the section
-const heading = "Start a project";
-const blurb =
-  "Tell me about your project—goals, audience, constraints—and I’ll reply within 1–2 business days.";
-
-// Replace with your Formspree/Getform/Basin endpoint:
-const endpoint = "https://formspree.io/f/your-id";
+const leftRail = "96px";
+const cta = {
+  heading: "Start a project",
+  blurb: "Share a few details and I’ll reply with next steps.",
+};
 ---
 
 <section id="contact" class="section bg-[var(--surface-0,#0a0a0a)]">
-  <ContactForm client:load {endpoint} leftRail="96px" {heading} {blurb} />
+  <div class="mx-auto max-w-6xl px-4 py-12 sm:py-14 lg:py-16">
+    <!-- Contained header (optional extra copy above the filmstrip card) -->
+    <div class="mb-4">
+      <h2
+        class="text-[clamp(1.15rem,2vw,1.35rem)] font-extrabold tracking-tight text-white flex items-center gap-2"
+      >
+        <span
+          class="inline-block h-3 w-1.5"
+          style="background: var(--color-brand-500,#E2A028);"></span>
+        Contact
+      </h2>
+    </div>
+
+    {/* Filmstrip-style contact block */}
+    <ContactForm
+      client:load
+      leftRail={leftRail}
+      heading={cta.heading}
+      blurb={cta.blurb}
+    />
+  </div>
 </section>

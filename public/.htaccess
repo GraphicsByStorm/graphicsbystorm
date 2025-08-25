@@ -1,0 +1,7 @@
+# Serve index.html in folders
+DirectoryIndex index.html
+
+# Gzip/deflate
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

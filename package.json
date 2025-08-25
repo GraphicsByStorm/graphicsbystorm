@@ -6,26 +6,16 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "postinstall": "prisma generate"
+    "astro": "astro"
   },
   "dependencies": {
     "@iconify-json/simple-icons": "^1.2.48",
-    "@iconify/svelte": "^5.0.1",
-    "@lucia-auth/adapter-prisma": "^4.0.1",
-    "@paypal/paypal-server-sdk": "^1.1.0",
-    "@prisma/client": "^5.22.0",
     "astro": "^5.13.2",
-    "bcrypt": "^6.0.0",
-    "bcryptjs": "^3.0.2",
-    "lucia": "^3.2.2",
-    "square": "^43.0.1",
-    "zod": "^3.25.76"
+    "@iconify/svelte": "^5.0.1"
   },
   "devDependencies": {
     "@astrojs/svelte": "^7.1.0",
     "@tailwindcss/vite": "^4.1.12",
-    "prisma": "^5.22.0",
     "svelte": "^5.38.1",
     "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2"

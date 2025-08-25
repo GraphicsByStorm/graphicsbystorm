@@ -1,13 +1,272 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import Header from '$components/Header.astro';
-import AboutSection from '$components/sections/AboutSection.astro';
-import SectionHeader from '$components/SectionHeader.astro';
+import BaseLayout from "$layouts/BaseLayout.astro";
+import TechBadges from "$svelte/components/TechBadges.svelte";
+import OpenClosedBadge from "$svelte/components/OpenClosedBadge.svelte";
+
+/** Content */
+const leftRail = "96px";
+
+const headline = "Technology jackknife: design, 3D, video, full-stack.";
+const subhead =
+  "Bold, witty, critique-driven. Clean modern craft with a gritty, grungy edge.";
+const bio = `I started designing and editing at 10—running a gaming clan with no budget, just drive. Self-taught until 26, then a 3-year sprint to a B.S. in Graphic Design & Multimedia Arts (3.80 GPA; honor roll/dean’s list almost every semester). I build conversation-focused visuals and ship only when it’s right—quality over quantity. Weekly 1:1s, clear milestones, and a brand story that actually *speaks* for you.`;
+
+const tools = [
+  "Photoshop",
+  "Illustrator",
+  "InDesign",
+  "Affinity Photo",
+  "Affinity Designer",
+  "Affinity Publisher",
+  "Figma",
+  "Svelte",
+  "SvelteKit",
+  "Astro",
+  "GitHub",
+  "Tailwind CSS",
+  "TypeScript",
+  "Prisma",
+  "Firebase",
+];
+
+const metrics = [
+  { label: "Projects shipped", value: "20+" },
+  { label: "Typical turnaround", value: "1–3 weeks" },
+];
+
+const portraitSrc = undefined; // e.g. "/images/about/me.jpg"
+
+/** CTAs → static pages */
+const ctaPrimary = { text: "Start a project", href: "/contact" };
+const ctaSecondary = { text: "See case studies →", href: "/case-studies" };
+
+/** Filmstrip row settings */
+const ROW_HEIGHT_PX = 360;
+const bg = "/images/about/cover.jpg"; // optional — leave empty "" for flat
 ---
-<BaseLayout title="About — GraphicsByStorm">
-  <Header />
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <SectionHeader label="About" href="/#about" />
-    <AboutSection />
-  </main>
+
+<BaseLayout
+  title="About • Graphics by Storm"
+  description="Bold, critique-driven work across brand, social, promo, and more."
+>
+  <section id="about" class="bg-[var(--surface-1,#0b0b0b)]">
+    <!-- Full-bleed ‘filmstrip’ row WITH the Technology jackknife copy (as before) -->
+    <div
+      class="group row-bleed relative isolate bg-black"
+      style={`--row-h:${ROW_HEIGHT_PX}px;`}
+    >
+      <!-- Background layer (optional image) -->
+      <div
+        class="absolute inset-0 z-0 bg-no-repeat bg-cover bg-center"
+        style={bg ? `background-image:url('${bg}')` : ""}
+      >
+      </div>
+      <!-- Subtle veil to ensure text contrast -->
+      <div class="veil z-[4]"></div>
+
+      <!-- Content -->
+      <div class="absolute inset-0 z-10 px-4 sm:px-6">
+        <div
+          class="mx-auto max-w-6xl h-full flex flex-col justify-center lg:pl-16 lg:pr-6"
+        >
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <h2 class="section-hdr text-[clamp(1.35rem,2.2vw,1.75rem)]">
+              {headline}
+            </h2>
+            <OpenClosedBadge client:load />
+          </div>
+
+          <p
+            class="max-w-[75ch] text-[clamp(.95rem,1.2vw,1.05rem)] text-neutral-200"
+          >
+            {subhead}
+          </p>
+          <p
+            class="mt-2 max-w-[78ch] text-[clamp(.9rem,1.05vw,1rem)] text-neutral-300"
+          >
+            {bio}
+          </p>
+
+          <!-- CTAs (square, flat) -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a
+              href={ctaPrimary.href}
+              class="inline-flex items-center gap-2 border border-white/20 bg-white/10 px-4 py-2 font-semibold text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            >
+              {ctaPrimary.text}
+            </a>
+            <a
+              href={ctaSecondary.href}
+              class="inline-flex items-center gap-2 border border-white/20 bg-transparent px-4 py-2 font-semibold text-white/90 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-500)]"
+            >
+              {ctaSecondary.text}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compact highlight band (scannable, square edges) -->
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-10">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]">
+        <!-- Left: Process -->
+        <section>
+          <h3
+            class="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400"
+          >
+            Process
+          </h3>
+          <ol class="space-y-3">
+            <li class="about-card">
+              <div class="about-card__title">Discovery</div>
+              <p class="about-card__body">
+                1:1 kickoff to learn your story, problem, and goals—gather
+                inputs to aim concepts at real outcomes.
+              </p>
+            </li>
+            <li class="about-card">
+              <div class="about-card__title">Development</div>
+              <p class="about-card__body">
+                Research + inspiration, competitor scan, and early studies;
+                translate the story into bold directions.
+              </p>
+            </li>
+            <li class="about-card">
+              <div class="about-card__title">Concepts</div>
+              <p class="about-card__body">
+                Walkthrough of sketches/concepts; we pick apart details together
+                and decide the strongest direction.
+              </p>
+            </li>
+            <li class="about-card">
+              <div class="about-card__title">Iteration</div>
+              <p class="about-card__body">
+                Refine and push the chosen concept; one more review to lock it
+                in or cycle once more if needed.
+              </p>
+            </li>
+            <li class="about-card">
+              <div class="about-card__title">Finalization & Delivery</div>
+              <p class="about-card__body">
+                Final design + all exports (source files,
+                PNG/JPG/SVG/AI/Affinity). Includes a file-format guide &
+                support.
+              </p>
+            </li>
+            <li class="about-card">
+              <div class="about-card__title">One-Month Check-In</div>
+              <p class="about-card__body">
+                Follow-up to see results in the wild and request a testimonial
+                if you’re thrilled.
+              </p>
+            </li>
+          </ol>
+        </section>
+
+        <!-- Right: Portrait (optional) → Tools → Metrics -->
+        <aside class="lg:pl-6">
+          {
+            portraitSrc ? (
+              <div class="overflow-hidden border border-white/10">
+                <img
+                  src={portraitSrc}
+                  alt="Portrait"
+                  class="block w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            ) : null
+          }
+
+          <div class="mt-6">
+            <h3
+              class="mb-2 text-sm font-semibold uppercase tracking-wider text-neutral-400"
+            >
+              Tooling
+            </h3>
+            <TechBadges client:load items={tools} />
+          </div>
+
+          <div class="mt-6 grid grid-cols-2 gap-3">
+            {
+              metrics.map((m) => (
+                <div class="about-kpi">
+                  <div class="about-kpi__value">{m.value}</div>
+                  <div class="about-kpi__label">{m.label}</div>
+                </div>
+              ))
+            }
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  /* Full-bleed helpers */
+  .row-bleed {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+    min-height: var(--row-h, 320px);
+  }
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.55)
+    );
+  }
+
+  /* Section/typography */
+  .section-hdr {
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    color: #fff;
+  }
+
+  /* Cards & KPIs (square, flat) */
+  .about-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: color-mix(
+      in oklab,
+      #000 92%,
+      var(--color-brand-500, #e2a028) 8%
+    );
+    padding: 0.85rem 0.9rem;
+  }
+  .about-card__title {
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    margin-bottom: 0.25rem;
+  }
+  .about-card__body {
+    color: rgba(230, 230, 230, 0.88);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .about-kpi {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.9rem 1rem;
+  }
+  .about-kpi__value {
+    color: #fff;
+    font-weight: 900;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.15;
+  }
+  .about-kpi__label {
+    color: #9aa0a6;
+    font-size: 0.85rem;
+    margin-top: 0.15rem;
+  }
+</style>
