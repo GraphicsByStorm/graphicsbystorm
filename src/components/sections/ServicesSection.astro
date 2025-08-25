@@ -51,7 +51,7 @@ function coreDeliverables(svc: Service, limit = 6): string[] {
   </div>
 
   <!-- Full-bleed filmstrip (edge-to-edge; clears left rail / social bar) -->
-  <div class="svc-bleed" style="--svc-left-rail: var(--left-rail, 64px);">
+  <div class="svc-bleed" style="--svc-left-rail: var(--left-rail, 96px);">
     {SERVICES.map((svc: Service) => {
       const startAt = svc.tiers?.[0]?.price?.min ?? svc.typicalRange.min;
       const contactHref = `${cta.href}?service=${encodeURIComponent(svc.title)}`;

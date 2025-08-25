@@ -1,19 +1,16 @@
-<section
-  id="contact"
-  class="section section-brand-wash torn-top torn-angle-right"
-  style="--torn-color: var(--color-surface-950);"
->
-  <div class="section-inner">
-    <h2 class="heading-2 text-white mb-4">Contact</h2>
-    <form method="post" action="/api/contact" class="card p-5 space-y-4">
-      <div class="grid sm:grid-cols-2 gap-4">
-        <input name="name" placeholder="Your name" class="input" required />
-        <input name="email" type="email" placeholder="Email" class="input" required />
-      </div>
-      <input name="phone" placeholder="Phone (optional)" class="input" />
-      <input name="subject" placeholder="Project subject" class="input" />
-      <textarea name="message" placeholder="Tell me about your project…" class="textarea" required></textarea>
-      <button class="btn-brand">Send</button>
-    </form>
-  </div>
+---
+import ContactForm from "$svelte/components/ContactForm.svelte";
+export const prerender = true;
+
+// Optional: customize copy for the section
+const heading = "Start a project";
+const blurb =
+  "Tell me about your project—goals, audience, constraints—and I’ll reply within 1–2 business days.";
+
+// Replace with your Formspree/Getform/Basin endpoint:
+const endpoint = "https://formspree.io/f/your-id";
+---
+
+<section id="contact" class="section bg-[var(--surface-0,#0a0a0a)]">
+  <ContactForm client:load {endpoint} leftRail="96px" {heading} {blurb} />
 </section>

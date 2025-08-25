@@ -1,207 +1,199 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import CaseHero from "$svelte/components/CaseHero.svelte";
+import BaseLayout from "$layouts/BaseLayout.astro";
 import { WORKS } from "$lib/data/work";
-import { WORK_META, type CaseStudyDetails } from "$lib/data/workMeta";
+import { WORK_META, type WorkMeta } from "$lib/data/workMeta";
+import CaseStudyHero from "$svelte/components/CaseStudyHero.svelte";
 
+/** Build-time prerender only (no SSR) */
 export const prerender = true;
 
+/** Generate static paths for all work items */
 export async function getStaticPaths() {
   return WORKS.map((w) => ({ params: { slug: w.slug } }));
 }
 
+/** Resolve item from slug and merge with meta */
 const { slug } = Astro.params;
 const base = WORKS.find((w) => w.slug === slug);
 if (!base) throw new Error(`Case study not found: ${slug}`);
 
-type MetaShape = Partial<typeof base> & {
-  details?: CaseStudyDetails;
-  date?: string;
-  year?: number;
-  coverPosition?: "top" | "contain" | "cover";
-  typography?: { family: string; weights?: string[]; sources?: string[]; notes?: string };
-  palette?: { name: string; hex: string; rgb?: string; hsl?: string }[];
-  process?: { label: string; date?: string; note?: string }[];
-};
-const meta = (WORK_META as Record<string, MetaShape>)[slug!] ?? {};
+const meta: WorkMeta = WORK_META[slug!] ?? {};
 const item = { ...base, ...meta };
 
-const {
-  title,
-  blurb = "",
-  cover,
-  images,
-  tags = [],
-  tools = [],
-  highlights = [],
-  summary = "",
-  slug: itemSlug,
-  date,
-  year,
-  coverPosition = "cover",
-  details,
-  typography,
-  palette = [],
-  process = []
-} = item;
+const images: string[] = Array.isArray(item.images) ? item.images : [];
+const cover = item.cover || images[0] || "";
+const otherImages = images.filter((src) => src !== cover);
 
-// Prev/Next
-const idx = WORKS.findIndex((w) => w.slug === itemSlug);
-const prev = WORKS[(idx - 1 + WORKS.length) % WORKS.length];
-const next = WORKS[(idx + 1) % WORKS.length];
+/** Left rail offset used by hero filmstrip */
+const leftRail = "96px";
 ---
 
-<BaseLayout title={`${title} • Case Study`} description={summary}>
-  <!-- HERO (click → immersive lightbox) -->
-  <section class="px-4 sm:px-6 lg:px-8 pt-8">
-    <CaseHero
-      client:load
-      images={images}
-      cover={cover}
-      coverPosition={coverPosition}
-      title={title}
-      blurb={blurb}
-      slug={itemSlug}
-      tags={tags}
-      date={date}
-      year={year}
-    />
-  </section>
+<BaseLayout title={`${item.title} • Case Study`} description={item.summary}>
+  <!-- HERO (same filmstrip styling as homepage hero) -->
+  <CaseStudyHero
+    client:visible
+    images={images}
+    cover={cover}
+    title={item.title}
+    summary={item.blurb ?? item.summary ?? ""}
+    tags={item.tags ?? []}
+    year={item.year}
+    date={(item as any).date}
+    coverPosition={item.coverPosition ?? "cover"}
+  />
 
-  <!-- OVERVIEW & HIGHLIGHTS (above the fold) -->
-  {(summary || highlights.length) && (
-    <section class="px-4 sm:px-6 lg:px-8 mt-8">
-      <div class="mx-auto max-w-6xl grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
-        <article class="space-y-5">
-          {summary && (
-            <section class="rounded-2xl border border-white/10 bg-white/5 p-5">
-              <h2 class="text-base font-bold text-white/95">Overview</h2>
-              <p class="mt-2 text-neutral-200/95 leading-relaxed">{summary}</p>
-            </section>
-          )}
+  <!-- Article body -->
+  <article class="mx-auto max-w-6xl px-4 py-10 text-neutral-100">
+    {item.summary && <p class="lead">{item.summary}</p>}
 
-          {highlights.length > 0 && (
-            <section class="rounded-2xl border border-white/10 bg-white/5 p-5">
-              <h2 class="text-base font-bold text-white/95">Highlights</h2>
-              <ul class="mt-2 space-y-1 text-neutral-200/95">
-                {highlights.map((h) => (
-                  <li class="flex gap-2"><span aria-hidden="true">•</span><span>{h}</span></li>
-                ))}
-              </ul>
-            </section>
-          )}
-        </article>
+    {
+      item.highlights?.length ? (
+        <ul class="mt-4 space-y-1 list-disc pl-5 text-neutral-200/95">
+          {item.highlights.map((h) => (
+            <li>{h}</li>
+          ))}
+        </ul>
+      ) : null
+    }
 
-        <!-- Meta rail (compact) -->
-        <aside class="h-fit rounded-2xl border border-white/10 bg-white/5 p-4 lg:sticky lg:top-6">
-          {cover && <img src={cover} alt="" class="w-full rounded-xl border border-white/10 object-cover" loading="lazy" decoding="async" />}
-          {tools.length > 0 && (
-            <div class="mt-4">
-              <h3 class="font-semibold text-white/95 mb-2">Tools</h3>
-              <div class="flex flex-wrap gap-2">
-                {tools.map((t) => <span class="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[12px]">{t}</span>)}
-              </div>
+    <!-- Long-form details (optional copy blocks) -->
+    {
+      (item as any).details && (
+        <section class="mt-8 grid gap-6">
+          {(item as any).details.tools && (
+            <div class="cs-block">
+              <h3 class="cs-h">Tools</h3>
+              <p class="cs-p">{(item as any).details.tools}</p>
             </div>
           )}
-          {tags.length > 0 && (
-            <div class="mt-3">
-              <h3 class="font-semibold text-white/95 mb-2">Categories</h3>
-              <div class="flex flex-wrap gap-1.5">
-                {tags.map((t) => <span class="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-[11px]">{t}</span>)}
-              </div>
+          {(item as any).details.design && (
+            <div class="cs-block">
+              <h3 class="cs-h">Design</h3>
+              <p class="cs-p">{(item as any).details.design}</p>
             </div>
           )}
-          {(year || date) && (
-            <div class="mt-3 text-[12px] text-white/70 flex items-center gap-2">
-              {year && <span>{year}</span>}
-              {date && <span aria-hidden="true">•</span>}
-              {date && <time datetime={date}>{date}</time>}
+          {(item as any).details.creativity && (
+            <div class="cs-block">
+              <h3 class="cs-h">Creativity</h3>
+              <p class="cs-p">{(item as any).details.creativity}</p>
             </div>
           )}
-        </aside>
-      </div>
-    </section>
-  )}
+          {(item as any).details.critique && (
+            <div class="cs-block">
+              <h3 class="cs-h">Critique</h3>
+              <p class="cs-p">{(item as any).details.critique}</p>
+            </div>
+          )}
+          {(item as any).details.directions && (
+            <div class="cs-block">
+              <h3 class="cs-h">Directions</h3>
+              <p class="cs-p">{(item as any).details.directions}</p>
+            </div>
+          )}
+          {(item as any).details.craftsmanship && (
+            <div class="cs-block">
+              <h3 class="cs-h">Craft</h3>
+              <p class="cs-p">{(item as any).details.craftsmanship}</p>
+            </div>
+          )}
+        </section>
+      )
+    }
+  </article>
 
-  <!-- DESIGN SYSTEM: Typography, Palette, Process (no image grid) -->
-  {(typography || palette.length || process.length) && (
-    <section class="px-4 sm:px-6 lg:px-8 mt-10">
-      <div class="mx-auto max-w-6xl grid gap-6 lg:grid-cols-2">
-        {typography && (
-          <section class="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <h2 class="text-base font-bold text-white/95">Typography</h2>
-            <div class="mt-2 text-neutral-200/95 leading-relaxed">
-              <div class="flex items-center gap-2 text-[14px]">
-                <span class="font-semibold text-white/95">Font Family:</span>
-                <span>{typography.family}</span>
-              </div>
-              {typography.weights?.length && (
-                <div class="mt-1 text-[13px]"><span class="text-white/80">Weights:</span> {typography.weights.join(", ")}</div>
-              )}
-              {typography.sources?.length && (
-                <div class="mt-1 text-[13px]"><span class="text-white/80">Sources:</span> {typography.sources.join(", ")}</div>
-              )}
-              {typography.notes && <p class="mt-2 text-[13px] text-neutral-200/90">{typography.notes}</p>}
-            </div>
+  <!-- Edge-to-edge image bands (keep aspect ratio, reasonable size) -->
+  {
+    otherImages.length
+      ? otherImages.map((src) => (
+          <section class="bleed">
+            <figure class="band edge">
+              <img src={src} alt="" loading="lazy" class="cs-img" />
+            </figure>
           </section>
-        )}
+        ))
+      : null
+  }
 
-        {palette.length > 0 && (
-          <section class="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <h2 class="text-base font-bold text-white/95">Color Palette</h2>
-            <div class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {palette.map((c) => (
-                <div class="rounded-xl border border-white/10 overflow-hidden">
-                  <div class="h-16" style={`background:${c.hex}`}></div>
-                  <div class="p-3 text-[12px] leading-relaxed">
-                    <div class="font-semibold text-white/95">{c.name}</div>
-                    <div class="text-white/85">HEX: {c.hex}</div>
-                    {c.rgb && <div class="text-white/75">RGB(A): {c.rgb}</div>}
-                    {c.hsl && <div class="text-white/75">HSL: {c.hsl}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {process.length > 0 && (
-          <section class="lg:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <h2 class="text-base font-bold text-white/95">Design Process</h2>
-            <ol class="mt-4 relative border-l border-white/10 pl-4">
-              {process.map((step) => (
-                <li class="mb-4 last:mb-0">
-                  <div class="absolute -left-[7px] mt-[2px] size-3 rounded-full" style="background:var(--color-brand-500,#E2A028)"></div>
-                  <div class="text-[14px] font-semibold text-white/95">{step.label}</div>
-                  <div class="text-[12px] text-white/70">{step.date}</div>
-                  {step.note && <p class="mt-1 text-[13px] text-neutral-200/90">{step.note}</p>}
-                </li>
-              ))}
-            </ol>
-          </section>
-        )}
-      </div>
-    </section>
-  )}
-
-  <!-- PREV / NEXT -->
-  <nav class="px-4 sm:px-6 lg:px-8 mt-12 mb-14">
-    <div class="mx-auto max-w-6xl grid gap-4 sm:grid-cols-2">
-      <a href={`/case-study/${prev.slug}`} class="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[.05] p-3 hover:bg-white/[.08] transition">
-        <img src={prev.cover} alt="" class="size-14 rounded-lg border border-white/10 object-cover" loading="lazy" />
-        <div>
-          <div class="text-[11px] text-white/70">Previous</div>
-          <div class="font-semibold text-white group-hover:underline underline-offset-4">{prev.title}</div>
-        </div>
-      </a>
-
-      <a href={`/case-study/${next.slug}`} class="group flex items-center gap-3 justify-end rounded-xl border border-white/10 bg-white/[.05] p-3 hover:bg-white/[.08] transition">
-        <div class="text-right">
-          <div class="text-[11px] text-white/70">Next</div>
-          <div class="font-semibold text-white group-hover:underline underline-offset-4">{next.title}</div>
-        </div>
-        <img src={next.cover} alt="" class="size-14 rounded-lg border border-white/10 object-cover" loading="lazy" />
-      </a>
-    </div>
-  </nav>
+  <!-- Back link (optional) -->
+  <div class="mx-auto max-w-6xl px-4 py-10">
+    <a href="/#work" class="back-link">← Back to work</a>
+  </div>
 </BaseLayout>
+
+<style>
+  /* Article text */
+  .lead {
+    color: #e5e7eb;
+    max-width: 70ch;
+    line-height: 1.6;
+  }
+  .cs-block {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.9rem 1rem;
+  }
+  .cs-h {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    color: #fff;
+    font-size: 0.95rem;
+    margin: 0 0 0.35rem;
+  }
+  .cs-h::before {
+    content: "";
+    width: 6px;
+    height: 12px;
+    background: var(--color-brand-500, #e2a028);
+  }
+  .cs-p {
+    color: #d9dde2;
+    line-height: 1.65;
+  }
+
+  /* Full-bleed helper (edge-to-edge containers) */
+  .bleed {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+  }
+
+  /* Edge image band: center content, keep ratio, constrain size */
+  .band.edge {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    background: #0c0c0c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 0; /* small breathing room without cramping */
+    overflow: hidden;
+  }
+  .cs-img {
+    display: block;
+    height: auto; /* keep aspect ratio */
+    max-height: min(85vh, 1200px);
+    width: auto; /* prevent over-stretched portrait shots */
+    max-width: min(100vw, 1920px); /* cap super-wide images */
+    object-fit: contain; /* no cropping; show full artwork */
+  }
+
+  /* Back link styling */
+  .back-link {
+    color: var(--color-brand-500, #e2a028);
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 640px) {
+    .cs-img {
+      max-height: 70vh;
+      max-width: 100vw;
+    }
+  }
+</style>

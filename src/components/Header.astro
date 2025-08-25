@@ -1,66 +1,133 @@
 ---
-// File: src/components/Header.astro
-import LogoAsync from '$components/LogoAsync.astro';
-import UserMenu from '$svelte/components/UserMenu.svelte';
+/* File: src/components/Header.astro */
+import LogoAsync from "$components/LogoAsync.astro";
+
+/**
+ * If/when you add a dedicated About page, switch ABOUT_ROUTE to "/about".
+ * For now we point to the homepage section as a graceful fallback.
+ */
+const ABOUT_ROUTE = "/#about";
 
 const leftLinks = [
-  { href: "#hero", label: "Home" },
-  { href: "#work", label: "Work" },
-  { href: "#about", label: "About" },
+  { href: "/", label: "Home" },
+  { href: "/case-studies", label: "Case Studies" },
+  { href: ABOUT_ROUTE, label: "About" },
 ];
 
 const rightLinks = [
-  { href: "#services", label: "Services" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#shop", label: "Shop" },
-  { href: "#contact", label: "Contact" },
+  { href: "/services", label: "Services" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
 ];
-
-const isHome = Astro.url.pathname === "/";
-const withBase = (hash: string) => (isHome ? hash : `/${hash}`);
-
-const { user } = Astro.locals;
 ---
-<header class="sticky header-surface noise-overlay">
+
+<header class="sticky inset-x-0 top-0 z-50 header-surface noise-overlay">
   <nav class="header-inner" aria-label="Primary">
     <div class="header-bar">
       <!-- Left (desktop) -->
       <ul class="hidden md:flex items-center gap-6">
-        {leftLinks.map((item) => (
-          <li><a href={withBase(item.href)} class="nav-link">{item.label}</a></li>
-        ))}
+        {
+          leftLinks.map((item) => (
+            <li>
+              <a href={item.href} class="nav-link">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
 
       <!-- Center logo -->
       <div class="justify-self-center">
-        <LogoAsync href={withBase('#hero')} class="h-8 w-auto mt-[2px]" />
+        <LogoAsync href="/" class="h-8 w-auto mt-[2px]" />
       </div>
 
       <!-- Right (desktop) -->
       <div class="hidden md:flex items-center gap-4 justify-self-end">
         <ul class="flex items-center gap-6">
-          {rightLinks.map((item) => (
-            <li><a href={withBase(item.href)} class="nav-link">{item.label}</a></li>
-          ))}
-        </ul>
-        <UserMenu client:load user={user} />
-      </div>
-
-      <!-- Mobile: single-row rail + user menu -->
-      <div class="md:hidden flex items-center gap-3 justify-self-end">
-        <div class="nav-rail">
-          <ul class="flex items-center gap-3">
-            {[...leftLinks, ...rightLinks].map((item) => (
+          {
+            rightLinks.map((item) => (
               <li>
-                <a href={withBase(item.href)} class="text-xs text-neutral-300 hover:text-white whitespace-nowrap px-2 py-1.5 rounded">
+                <a href={item.href} class="nav-link">
                   {item.label}
                 </a>
               </li>
-            ))}
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Mobile rail -->
+      <div class="md:hidden flex items-center gap-3 justify-self-end">
+        <div class="nav-rail">
+          <ul class="flex items-center gap-2 px-2">
+            {
+              [...leftLinks, ...rightLinks].map((item) => (
+                <li>
+                  <a href={item.href} class="rail-link">
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
           </ul>
         </div>
-        <UserMenu client:load strategy="fixed" user={user} />
       </div>
     </div>
   </nav>
 </header>
+
+<style>
+  /* Sticky shell fallback if your global classes aren't present */
+  .header-surface {
+    backdrop-filter: saturate(140%) blur(8px);
+    background: color-mix(in oklab, black 65%, transparent);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .header-inner {
+    max-width: 88rem;
+    margin-inline: auto;
+    padding: 0.5rem 1rem;
+  }
+  .header-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    min-height: 56px;
+  }
+  .nav-link {
+    color: #d1d5db;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    padding: 0.25rem 0;
+  }
+  .nav-link:hover {
+    color: #fff;
+  }
+
+  /* Mobile horizontal rail */
+  .nav-rail {
+    max-width: min(92vw, 640px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .nav-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail-link {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 0.78rem;
+    color: #cbd5e1;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0;
+  }
+  .rail-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+  }
+</style>

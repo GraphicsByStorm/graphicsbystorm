@@ -1,84 +1,90 @@
 // src/lib/data/workMeta.ts
 import type { WorkItem } from "./work";
+import {
+  hexToRgb,
+  rgbToHslString,
+  rgbToString,
+  rgbaString,
+  descriptiveNameFromHex,
+  parseGoogleFontsHref,
+} from "$lib/utils/color";
 
-/**
- * Long-form rubric content surfaced in the Lightbox + case-study pages.
- * Each field is optional in the type, but our entries below provide all of them.
- */
+/** Long-form rubric content shown in Lightbox + case-study pages */
 export type CaseStudyDetails = {
-  /** Working Knowledge of Software & Digital Tools */
-  tools?: string;
-  /** Elements & Principles of Design */
-  design?: string;
-  /** Creative Self-Expression & Originality */
-  creativity?: string;
-  /** Thoughtful & Appropriate Critique Skills */
-  critique?: string;
-  /** Evidence of Following Directions */
-  directions?: string;
-  /** Craftsmanship & Attention to Detail */
-  craftsmanship?: string;
+  tools?: string; // Working Knowledge of Software & Digital Tools
+  design?: string; // Elements & Principles of Design
+  creativity?: string; // Creative Self-Expression & Originality
+  critique?: string; // Thoughtful & Appropriate Critique Skills
+  directions?: string; // Evidence of Following Directions
+  craftsmanship?: string; // Craftsmanship & Attention to Detail
 };
 
-/** Optional, structured design metadata used on case-study pages */
+/** Typography metadata used on case-study pages */
 export type TypographyMeta = {
-  /** e.g., "Inter", "SF Pro", "Bookmania" */
-  family: string;
+  /** e.g., "Inter", "SF Pro", "Bookmania" (optional when `url` is provided) */
+  family?: string;
   /** e.g., ["400","600","700"] or ["Regular","Semibold","Bold"] */
   weights?: string[];
   /** e.g., ["Google Fonts", "Adobe Fonts", "Local @font-face"] */
   sources?: string[];
   /** Additional notes on pairing, tracking, usage, etc. */
   notes?: string;
+  /**
+   * Optional CSS URL for auto-detection (e.g. Google Fonts):
+   * "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+   */
+  url?: string;
 };
 
 export type PaletteColor = {
-  /** Friendly name like "Obsidian", "Accent", "Cream" */
-  name: string;
+  /** Friendly name like "Obsidian", "Accent", "Cream" (auto-generated if omitted) */
+  name?: string;
   /** Primary color in HEX form (required) */
   hex: string;
-  /** Optional RGB(A) string, e.g. "226,160,40" or "226,160,40,0.9" */
+  /** Optional RGB string, e.g. "226,160,40" */
   rgb?: string;
   /** Optional HSL string, e.g. "40,76%,52%" */
   hsl?: string;
+  /** Optional RGBA string some components may read; safe to include */
+  rgba?: string;
 };
 
 export type ProcessStep = {
   /** Milestone label, e.g. "Brief & Goals", "Monogram Study", "Handoff" */
   label: string;
-  /** Optional date string, e.g. "2023-10" or "Oct 2023" */
-  date?: string;
   /** Optional note describing the milestone */
   note?: string;
+  /** Optional bullets describing sub-points for the step */
+  bullets?: string[];
 };
 
 /**
  * Extra per-slug metadata
  * - coverPosition: controls overlay image fit behavior for banner-like images
- * - date: free-form date string (e.g., "Nov 2023", "2024-03")
- * - year: numeric badge shown in the overlay footer (hidden if undefined)
+ * - year/date: shown in the overlay header pills if present
  * - typography/palette/process: optional design system + timeline metadata
+ * - timeline: alias provided for older page code still reading `meta.timeline`
  */
 type ExtraOverlayMeta = {
   coverPosition?: "top" | "contain" | "cover";
-  date?: string;
   year?: number;
+  date?: string;
   typography?: TypographyMeta;
   palette?: PaletteColor[];
   process?: ProcessStep[];
+  /** Back-compat alias (same shape as `process`) */
+  timeline?: ProcessStep[];
 };
 
 /** Metadata overrides/augments keyed by slug */
-export type WorkMeta = Partial<WorkItem> & { details?: CaseStudyDetails } & ExtraOverlayMeta;
+export type WorkMeta = Partial<WorkItem> & {
+  details?: CaseStudyDetails;
+} & ExtraOverlayMeta;
 
-/**
- * Metadata for each case study keyed by slug.
- * Use this with a folder-scan approach (images from /public/images/work/[slug])
- * or simply as a central source of truth for titles, tags, summaries, etc.
- *
- * NOTE: We intentionally populate every optional field for each entry so
- * downstream UI can rely on their presence without defensive checks.
- */
+/* -----------------------------------------------------------------------------
+   WORK META (your entries preserved)
+----------------------------------------------------------------------------- */
+
 export const WORK_META: Record<string, WorkMeta> = {
   "fritz-streaming-social": {
     title: "Fritz Streaming & Social Package",
@@ -91,31 +97,70 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Optimized exports for Twitch; crisp panels and overlays.",
       "Readability improvements after critique (stroke/contrast tweaks).",
-      "Consistent hierarchy, alignment, and balance across assets."
+      "Consistent hierarchy, alignment, and balance across assets.",
     ],
     cover: "/images/work/fritz/cover.png",
     coverPosition: "contain",
-    date: "2024-03",
     year: 2024,
     typography: {
       family: "Inter",
       weights: ["500", "600", "800"],
       sources: ["Google Fonts"],
       notes:
-        "Inter provides high x-height and excellent small-size rendering for panel labels and overlay HUD text. Display moments use heavier weights with slight positive tracking to survive Twitch compression and variable stream scales."
+        "Inter provides high x-height and excellent small-size rendering for panel labels and overlay HUD text. Display moments use heavier weights with slight positive tracking to survive Twitch compression and variable stream scales.",
+      // url: "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap",
     },
     palette: [
-      { name: "UI Obsidian", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
-      { name: "Muted Charcoal", hex: "#1E1E1E", rgb: "30,30,30", hsl: "0,0%,12%" },
-      { name: "Brand Accent", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
-      { name: "Panel Ink", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+      {
+        name: "UI Obsidian",
+        hex: "#0B0B0B",
+        rgb: "11,11,11",
+        hsl: "0,0%,4%",
+        rgba: "11,11,11,1",
+      },
+      {
+        name: "Muted Charcoal",
+        hex: "#1E1E1E",
+        rgb: "30,30,30",
+        hsl: "0,0%,12%",
+        rgba: "30,30,30,1",
+      },
+      {
+        name: "Brand Accent",
+        hex: "#E2A028",
+        rgb: "226,160,40",
+        hsl: "40,76%,52%",
+        rgba: "226,160,40,1",
+      },
+      {
+        name: "Panel Ink",
+        hex: "#FFFFFF",
+        rgb: "255,255,255",
+        hsl: "0,0%,100%",
+        rgba: "255,255,255,1",
+      },
     ],
     process: [
-      { label: "Brief & Constraints", date: "2024-02-10", note: "Clarified Twitch safe areas and panel behavior across desktop/mobile." },
-      { label: "Grid & Type Studies", date: "2024-02-15", note: "Explored modular panel grids and micro-type treatments for legibility." },
-      { label: "Texture & Tone", date: "2024-02-20", note: "Added controlled digital-noise layers that survive compression without muddying." },
-      { label: "Overlay Pass & QA", date: "2024-03-02", note: "Live test on stream; tweaked contrast and stroke weights per feedback." },
-      { label: "Export & Handoff", date: "2024-03-06", note: "Delivered organized asset pack with naming, sizes, and update notes." }
+      {
+        label: "Brief & Constraints",
+        note: "Clarified Twitch safe areas and panel behavior across desktop/mobile.",
+      },
+      {
+        label: "Grid & Type Studies",
+        note: "Explored modular panel grids and micro-type treatments for legibility.",
+      },
+      {
+        label: "Texture & Tone",
+        note: "Added controlled digital-noise layers that survive compression without muddying.",
+      },
+      {
+        label: "Overlay Pass & QA",
+        note: "Live test on stream; tweaked contrast and stroke weights per feedback.",
+      },
+      {
+        label: "Export & Handoff",
+        note: "Delivered organized asset pack with naming, sizes, and update notes.",
+      },
     ],
     details: {
       tools:
@@ -129,8 +174,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "All assets adhere to Twitch banner/panel templates and allow safe cropping on variable aspect ratios. Deliverables include a README describing recommended OBS setups and replacement flows so the client can update panels independently.",
       craftsmanship:
-        "Text layers snap to pixel to prevent blur; panel padding and icon spacing are consistent across the kit. Sharpening is applied at output size, and a final noise micro-layer prevents smooth gradient banding on stream."
-    }
+        "Text layers snap to pixel to prevent blur; panel padding and icon spacing are consistent across the kit. Sharpening is applied at output size, and a final noise micro-layer prevents smooth gradient banding on stream.",
+    },
   },
 
   "cosmic-rvy": {
@@ -144,31 +189,69 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Neon/arcade palette with controlled contrast and spacing.",
       "Typographic letter-spacing rebalanced after critique.",
-      "Royalty-free textures and custom brushes for consistency."
+      "Royalty-free textures and custom brushes for consistency.",
     ],
     cover: "/images/work/cosmic-rvy/cover.png",
     coverPosition: "contain",
-    date: "2024-02",
     year: 2024,
     typography: {
       family: "Orbitron",
       weights: ["500", "700"],
       sources: ["Google Fonts"],
       notes:
-        "A geometric, sci-fi face complements the arcade motif. Wordmark tracking was iterated for avatar sizes; heavier weights are reserved for hero lockups while captions and secondary labels use the 500 weight to avoid glow spill."
+        "A geometric, sci-fi face complements the arcade motif. Wordmark tracking was iterated for avatar sizes; heavier weights are reserved for hero lockups while captions and secondary labels use the 500 weight to avoid glow spill.",
     },
     palette: [
-      { name: "Neon Pink", hex: "#FF4D8D", rgb: "255,77,141", hsl: "337,100%,65%" },
-      { name: "Cosmic Blue", hex: "#3DA9FC", rgb: "61,169,252", hsl: "205,97%,61%" },
-      { name: "Starfield Black", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
-      { name: "Nebula Glow", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" }
+      {
+        name: "Neon Pink",
+        hex: "#FF4D8D",
+        rgb: "255,77,141",
+        hsl: "337,100%,65%",
+        rgba: "255,77,141,1",
+      },
+      {
+        name: "Cosmic Blue",
+        hex: "#3DA9FC",
+        rgb: "61,169,252",
+        hsl: "205,97%,61%",
+        rgba: "61,169,252,1",
+      },
+      {
+        name: "Starfield Black",
+        hex: "#0B0B0B",
+        rgb: "11,11,11",
+        hsl: "0,0%,4%",
+        rgba: "11,11,11,1",
+      },
+      {
+        name: "Nebula Glow",
+        hex: "#E2A028",
+        rgb: "226,160,40",
+        hsl: "40,76%,52%",
+        rgba: "226,160,40,1",
+      },
     ],
     process: [
-      { label: "Moodboard & References", date: "2024-01-05", note: "Synthesized 80s arcade + cosmic motifs; scoped color energy and UX readability." },
-      { label: "Logo Vectorization", date: "2024-01-12", note: "Refined path joins and letterforms for crisp scaling." },
-      { label: "Template Suite", date: "2024-01-20", note: "Established banner/post/story variants with consistent margins." },
-      { label: "Texture & Glow Pass", date: "2024-01-27", note: "Added glow halos with controlled values to reduce caption washout." },
-      { label: "Handoff", date: "2024-02-02", note: "Packaged vectors, textures, and editable PSDs with usage notes." }
+      {
+        label: "Moodboard & References",
+        note: "Synthesized 80s arcade + cosmic motifs; scoped color energy and UX readability.",
+      },
+      {
+        label: "Logo Vectorization",
+        note: "Refined path joins and letterforms for crisp scaling.",
+      },
+      {
+        label: "Template Suite",
+        note: "Established banner/post/story variants with consistent margins.",
+      },
+      {
+        label: "Texture & Glow Pass",
+        note: "Added glow halos with controlled values to reduce caption washout.",
+      },
+      {
+        label: "Handoff",
+        note: "Packaged vectors, textures, and editable PSDs with usage notes.",
+      },
     ],
     details: {
       tools:
@@ -182,8 +265,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "Platform dimensions were baked into the templates. Each output includes notes on export scales and a preflight checklist to prevent compression artifacts on upload.",
       craftsmanship:
-        "Vector seams were cleaned to prevent hairline antialiasing. Texture grain uses a frequency that resists moiré on downscaling, with final outputs sharpened for the destination pixel density."
-    }
+        "Vector seams were cleaned to prevent hairline antialiasing. Texture grain uses a frequency that resists moiré on downscaling, with final outputs sharpened for the destination pixel density.",
+    },
   },
 
   "elite-build-ak47-promo": {
@@ -197,31 +280,66 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Composition studies to balance weapon visibility and type.",
       "Hierarchy/positioning refined after feedback.",
-      "Clean rasterization and consistent spacing for readability."
+      "Clean rasterization and consistent spacing for readability.",
     ],
     cover: "/images/work/elite-ak/cover.png",
     coverPosition: "contain",
-    date: "2024-01",
     year: 2024,
     typography: {
       family: "Anton",
       weights: ["400"],
       sources: ["Google Fonts"],
       notes:
-        "Anton’s condensed forms concentrate visual weight, allowing large, high-impact titles without overwhelming the render. Micro-tracking adjustments preserve counters and reduce haloing on glow edges."
+        "Anton’s condensed forms concentrate visual weight, allowing large, high-impact titles without overwhelming the render. Micro-tracking adjustments preserve counters and reduce haloing on glow edges.",
     },
     palette: [
-      { name: "Depth Black", hex: "#121212", rgb: "18,18,18", hsl: "0,0%,7%" },
-      { name: "Steel Gray", hex: "#2A2A2A", rgb: "42,42,42", hsl: "0,0%,16%" },
-      { name: "Highlight Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
-      { name: "Status White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+      {
+        name: "Depth Black",
+        hex: "#121212",
+        rgb: "18,18,18",
+        hsl: "0,0%,7%",
+        rgba: "18,18,18,1",
+      },
+      {
+        name: "Steel Gray",
+        hex: "#2A2A2A",
+        rgb: "42,42,42",
+        hsl: "0,0%,16%",
+        rgba: "42,42,42,1",
+      },
+      {
+        name: "Highlight Amber",
+        hex: "#E2A028",
+        rgb: "226,160,40",
+        hsl: "40,76%,52%",
+        rgba: "226,160,40,1",
+      },
+      {
+        name: "Status White",
+        hex: "#FFFFFF",
+        rgb: "255,255,255",
+        hsl: "0,0%,100%",
+        rgba: "255,255,255,1",
+      },
     ],
     process: [
-      { label: "Brief & Asset Prep", date: "2023-12-10", note: "Collected renders; normalized lighting and perspective." },
-      { label: "Composition Studies", date: "2023-12-15", note: "Balanced weapon silhouette vs. text block weight." },
-      { label: "Lighting & Atmosphere", date: "2023-12-18", note: "Spotlight and rim-light passes to create focus." },
-      { label: "Hierarchy Refinement", date: "2023-12-21", note: "Re-ordered title/CTA; tuned paddings for instant scan." },
-      { label: "Output QA", date: "2024-01-02", note: "Checked social crops; sharpened per-size." }
+      {
+        label: "Brief & Asset Prep",
+        note: "Collected renders; normalized lighting and perspective.",
+      },
+      {
+        label: "Composition Studies",
+        note: "Balanced weapon silhouette vs. text block weight.",
+      },
+      {
+        label: "Lighting & Atmosphere",
+        note: "Spotlight and rim-light passes to create focus.",
+      },
+      {
+        label: "Hierarchy Refinement",
+        note: "Re-ordered title/CTA; tuned paddings for instant scan.",
+      },
+      { label: "Output QA", note: "Checked social crops; sharpened per-size." },
     ],
     details: {
       tools:
@@ -235,8 +353,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "All exports follow platform aspect ratios and allow margin for captions/metadata overlays. File layers remain labeled and grouped for future re-skins.",
       craftsmanship:
-        "Edges are hand-refined to avoid fringing. A gentle, output-size sharpening pass prevents halos, and gradient banding is mitigated via low-amplitude noise."
-    }
+        "Edges are hand-refined to avoid fringing. A gentle, output-size sharpening pass prevents halos, and gradient banding is mitigated via low-amplitude noise.",
+    },
   },
 
   "pit-viper-awp-promo": {
@@ -250,31 +368,69 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Stronger shadows/gradients for drama.",
       "Title visibility prioritized from the start.",
-      "300 DPI export normalized for on-screen clarity."
+      "300 DPI export normalized for on-screen clarity.",
     ],
     cover: "/images/work/pit-viper/cover.png",
     coverPosition: "cover",
-    date: "2024-01",
     year: 2024,
     typography: {
       family: "Oswald",
       weights: ["600", "700"],
       sources: ["Google Fonts"],
       notes:
-        "A condensed grotesk with squared counters that holds up under angle and motion lines. Upper weights maintain integrity when composited over gradient fields and particle layers."
+        "A condensed grotesk with squared counters that holds up under angle and motion lines. Upper weights maintain integrity when composited over gradient fields and particle layers.",
     },
     palette: [
-      { name: "Night Field", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
-      { name: "Viper Green", hex: "#98FF98", rgb: "152,255,152", hsl: "120,100%,80%" },
-      { name: "Warning Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
-      { name: "Highlight White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+      {
+        name: "Night Field",
+        hex: "#0B0B0B",
+        rgb: "11,11,11",
+        hsl: "0,0%,4%",
+        rgba: "11,11,11,1",
+      },
+      {
+        name: "Viper Green",
+        hex: "#98FF98",
+        rgb: "152,255,152",
+        hsl: "120,100%,80%",
+        rgba: "152,255,152,1",
+      },
+      {
+        name: "Warning Amber",
+        hex: "#E2A028",
+        rgb: "226,160,40",
+        hsl: "40,76%,52%",
+        rgba: "226,160,40,1",
+      },
+      {
+        name: "Highlight White",
+        hex: "#FFFFFF",
+        rgb: "255,255,255",
+        hsl: "0,0%,100%",
+        rgba: "255,255,255,1",
+      },
     ],
     process: [
-      { label: "Axis & Angle", date: "2023-12-08", note: "Established a 12–15° diagonal for motion language." },
-      { label: "Compositing", date: "2023-12-12", note: "Blended masked weapon over gradient-mapped background." },
-      { label: "Type & Plate", date: "2023-12-15", note: "Added darker plate behind title to prevent washout." },
-      { label: "Texture Controls", date: "2023-12-18", note: "Reduced grain where it interfered with counters." },
-      { label: "Export & Checks", date: "2023-12-20", note: "Verified crop safety; applied tailored sharpening." }
+      {
+        label: "Axis & Angle",
+        note: "Established a 12–15° diagonal for motion language.",
+      },
+      {
+        label: "Compositing",
+        note: "Blended masked weapon over gradient-mapped background.",
+      },
+      {
+        label: "Type & Plate",
+        note: "Added darker plate behind title to prevent washout.",
+      },
+      {
+        label: "Texture Controls",
+        note: "Reduced grain where it interfered with counters.",
+      },
+      {
+        label: "Export & Checks",
+        note: "Verified crop safety; applied tailored sharpening.",
+      },
     ],
     details: {
       tools:
@@ -288,8 +444,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "Templates were validated against platform guidelines; a notes file explains how to update renders and maintain motion axis alignment.",
       craftsmanship:
-        "Edges are feather-tuned to avoid halos. Gradients include low-amplitude noise to suppress banding, and export sharpening differs for 1x vs. 2x to avoid over-crisping."
-    }
+        "Edges are feather-tuned to avoid halos. Gradients include low-amplitude noise to suppress banding, and export sharpening differs for 1x vs. 2x to avoid over-crisping.",
+    },
   },
 
   "awoke-gg-branding": {
@@ -303,31 +459,69 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "3D perspective drawing with smart guides and grids.",
       "Energy-drink-meets-esports vibe via color psychology.",
-      "Vector clarity and print-fidelity mockups."
+      "Vector clarity and print-fidelity mockups.",
     ],
     cover: "/images/work/awoke/cover.png",
     coverPosition: "contain",
-    date: "2023-11",
     year: 2023,
     typography: {
       family: "Eurostile",
       weights: ["700"],
       sources: ["Local @font-face"],
       notes:
-        "A square-grotesk with techno overtones that complements the perspective mark. Kerning and optical alignments were refined at large sizes to keep the logotype from visually tilting."
+        "A square-grotesk with techno overtones that complements the perspective mark. Kerning and optical alignments were refined at large sizes to keep the logotype from visually tilting.",
     },
     palette: [
-      { name: "Esports Red", hex: "#FF2D2D", rgb: "255,45,45", hsl: "0,100%,59%" },
-      { name: "Cool Blue", hex: "#2D8CFF", rgb: "45,140,255", hsl: "212,100%,59%" },
-      { name: "Depth Black", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
-      { name: "Highlight White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+      {
+        name: "Esports Red",
+        hex: "#FF2D2D",
+        rgb: "255,45,45",
+        hsl: "0,100%,59%",
+        rgba: "255,45,45,1",
+      },
+      {
+        name: "Cool Blue",
+        hex: "#2D8CFF",
+        rgb: "45,140,255",
+        hsl: "212,100%,59%",
+        rgba: "45,140,255,1",
+      },
+      {
+        name: "Depth Black",
+        hex: "#0B0B0B",
+        rgb: "11,11,11",
+        hsl: "0,0%,4%",
+        rgba: "11,11,11,1",
+      },
+      {
+        name: "Highlight White",
+        hex: "#FFFFFF",
+        rgb: "255,255,255",
+        hsl: "0,0%,100%",
+        rgba: "255,255,255,1",
+      },
     ],
     process: [
-      { label: "Brief & Attributes", date: "2023-10-20", note: "Defined traits: fast, competitive, premium—not edgy for edge’s sake." },
-      { label: "Perspective Sketches", date: "2023-10-25", note: "Explored foreshortening without readability loss." },
-      { label: "Vector Cleanup", date: "2023-10-28", note: "Corrected joins; normalized inner angles to prevent dark spots." },
-      { label: "Color & Mockups", date: "2023-11-02", note: "Dialed red/blue balance; tested on apparel, web, and signage." },
-      { label: "Specs & Handoff", date: "2023-11-06", note: "Clear space, minimum size, and color variants documented." }
+      {
+        label: "Brand Positioning",
+        note: "Defined modern-meets-heritage positioning and target audience.",
+      },
+      {
+        label: "Perspective Sketches",
+        note: "Explored foreshortening without readability loss.",
+      },
+      {
+        label: "Vector Cleanup",
+        note: "Corrected joins; normalized inner angles to prevent dark spots.",
+      },
+      {
+        label: "Color & Mockups",
+        note: "Dialed red/blue balance; tested on apparel, web, and signage.",
+      },
+      {
+        label: "Specs & Handoff",
+        note: "Clear space, minimum size, and color variants documented.",
+      },
     ],
     details: {
       tools:
@@ -341,8 +535,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "Brand specs include clear-space rules, minimum sizes, and color/usage variants. Assets are delivered in vector and raster, with spot-color versions for print.",
       craftsmanship:
-        "Anchor points are minimized and distributed to avoid bumps on tight curves. The logo is tested over textured and flat backgrounds to ensure consistent edge quality."
-    }
+        "Anchor points are minimized and distributed to avoid bumps on tight curves. The logo is tested over textured and flat backgrounds to ensure consistent edge quality.",
+    },
   },
 
   "obsidian-tides-twitter": {
@@ -356,31 +550,47 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Balanced hierarchy for name/slogan in symmetric layout.",
       "Monogram integrates O, T, and a subtle S curve.",
-      "Dimensions/exports follow Twitter branding specs."
+      "Dimensions/exports follow Twitter branding specs.",
     ],
     cover: "/images/work/obsidian/cover.png",
-    coverPosition: "top", // ensures the banner top is visible in the overlay
-    date: "2023-10",
+    coverPosition: "top",
     year: 2023,
     typography: {
       family: "Inter",
       weights: ["600", "800"],
       sources: ["Google Fonts"],
       notes:
-        "Inter’s clean geometry remains crisp in header crops. The slogan uses a lighter weight than the name to preserve hierarchy, and subtle tracking prevents dark massing around the monogram."
+        "Inter’s clean geometry remains crisp in header crops. The slogan uses a lighter weight than the name to preserve hierarchy, and subtle tracking prevents dark massing around the monogram.",
     },
+    // Hex-only entries intentionally left to demonstrate auto-enrichment:
     palette: [
-      { name: "Obsidian", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
-      { name: "Slate", hex: "#222222", rgb: "34,34,34", hsl: "0,0%,13%" },
-      { name: "Accent", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
-      { name: "Glitch White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" }
+      { hex: "#150f24" },
+      { hex: "#401e70" },
+      { hex: "#48bec0" },
+      { hex: "#3a7fbe" },
+      { hex: "#FFFFFF" },
     ],
     process: [
-      { label: "Brief & Crop Safety", date: "2023-09-22", note: "Mapped desktop vs. mobile header crops to reserve safe zones." },
-      { label: "Monogram Exploration", date: "2023-09-25", note: "Integrated O/T with a subtle S curve inside the negative space." },
-      { label: "Texture Pass", date: "2023-09-28", note: "Glitch field tuned to avoid distracting banding behind type." },
-      { label: "Contrast Plate", date: "2023-10-01", note: "Introduced faint plate to separate mark from background." },
-      { label: "Export & Verification", date: "2023-10-03", note: "Checked rendering at multiple viewport widths and themes." }
+      {
+        label: "Brief & Crop Safety",
+        note: "Mapped desktop vs. mobile header crops to reserve safe zones.",
+      },
+      {
+        label: "Monogram Exploration",
+        note: "Integrated O/T with a subtle S curve inside the negative space.",
+      },
+      {
+        label: "Texture Pass",
+        note: "Glitch field tuned to avoid distracting banding behind type.",
+      },
+      {
+        label: "Contrast Plate",
+        note: "Introduced faint plate to separate mark from background.",
+      },
+      {
+        label: "Export & Verification",
+        note: "Checked rendering at multiple viewport widths and themes.",
+      },
     ],
     details: {
       tools:
@@ -394,8 +604,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "Exports follow Twitter/X specs with attention to center-safe content. Notes recommend double-checking device previews, as the platform’s crop can shift.",
       craftsmanship:
-        "Edges stay smooth across background variance; all glow and grain pass thresholds that resist dithering and color banding after upload compression."
-    }
+        "Edges stay smooth across background variance; all glow and grain pass thresholds that resist dithering and color banding after upload compression.",
+    },
   },
 
   "client-file-format-guide": {
@@ -409,31 +619,69 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Clean grid, typographic consistency, and usable contrast.",
       "Interactive links implemented per feedback.",
-      "Pixel-snapped icons; a11y-minded contrast and spacing."
+      "Pixel-snapped icons; a11y-minded contrast and spacing.",
     ],
     cover: "/images/work/format-guide/cover.png",
     coverPosition: "contain",
-    date: "2023-09",
     year: 2023,
     typography: {
       family: "Source Sans 3",
       weights: ["400", "600"],
       sources: ["Google Fonts"],
       notes:
-        "A humanist sans chosen for clear paragraph differentiation and approachable tone. Paragraph/character styles enforce hierarchy while keeping callouts discoverable in long-form reading."
+        "A humanist sans chosen for clear paragraph differentiation and approachable tone. Paragraph/character styles enforce hierarchy while keeping callouts discoverable in long-form reading.",
     },
     palette: [
-      { name: "Paper", hex: "#F7EFE5", rgb: "247,239,229", hsl: "33,56%,93%" },
-      { name: "Ink", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
-      { name: "Link Blue", hex: "#3DA9FC", rgb: "61,169,252", hsl: "205,97%,61%" },
-      { name: "Accent Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" }
+      {
+        name: "Paper",
+        hex: "#F7EFE5",
+        rgb: "247,239,229",
+        hsl: "33,56%,93%",
+        rgba: "247,239,229,1",
+      },
+      {
+        name: "Ink",
+        hex: "#0B0B0B",
+        rgb: "11,11,11",
+        hsl: "0,0%,4%",
+        rgba: "11,11,11,1",
+      },
+      {
+        name: "Link Blue",
+        hex: "#3DA9FC",
+        rgb: "61,169,252",
+        hsl: "205,97%,61%",
+        rgba: "61,169,252,1",
+      },
+      {
+        name: "Accent Amber",
+        hex: "#E2A028",
+        rgb: "226,160,40",
+        hsl: "40,76%,52%",
+        rgba: "226,160,40,1",
+      },
     ],
     process: [
-      { label: "Outline & Grid", date: "2023-08-28", note: "Established 12-col grid and typographic rhythm." },
-      { label: "Icon Set Design", date: "2023-09-01", note: "Vector icons aligned to pixel grid for clarity at small sizes." },
-      { label: "Interactive Layers", date: "2023-09-04", note: "Added hyperlinks, anchors, and bookmarks for navigation." },
-      { label: "A11y Pass", date: "2023-09-06", note: "Contrast checks and logical reading order validated." },
-      { label: "Export Packages", date: "2023-09-08", note: "Produced interactive PDF and print-safe variants with embedded assets." }
+      {
+        label: "Outline & Grid",
+        note: "Established 12-col grid and typographic rhythm.",
+      },
+      {
+        label: "Icon Set Design",
+        note: "Vector icons aligned to pixel grid for clarity at small sizes.",
+      },
+      {
+        label: "Interactive Layers",
+        note: "Added hyperlinks, anchors, and bookmarks for navigation.",
+      },
+      {
+        label: "A11y Pass",
+        note: "Contrast checks and logical reading order validated.",
+      },
+      {
+        label: "Export Packages",
+        note: "Produced interactive PDF and print-safe variants with embedded assets.",
+      },
     ],
     details: {
       tools:
@@ -447,8 +695,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "The guide respects both screen and print contexts. File packages include fonts/links and an instructions page for client-side updates.",
       craftsmanship:
-        "Icons snap to the pixel grid; tables and callouts align to baseline. Exported PDFs retain crisp vector rendering and pass link validation."
-    }
+        "Icons snap to the pixel grid; tables and callouts align to baseline. Exported PDFs retain crisp vector rendering and pass link validation.",
+    },
   },
 
   "upper-crust-branding": {
@@ -462,31 +710,69 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Icon rooted in pastry form; modern + heritage balance.",
       "Typographic/spacing corrections after critique.",
-      "Print-ready specs for letterhead, envelope, and cards."
+      "Print-ready specs for letterhead, envelope, and cards.",
     ],
     cover: "/images/work/upper-crust/cover.png",
     coverPosition: "contain",
-    date: "2023-08",
     year: 2023,
     typography: {
       family: "Cormorant Garamond",
       weights: ["500", "700"],
       sources: ["Google Fonts"],
       notes:
-        "A refined serif with classical proportions reinforces the premium, heritage tone. Tight wordmarks are balanced with generous line spacing in body copy to maintain readability."
+        "A refined serif with classical proportions reinforces the premium, heritage tone. Tight wordmarks are balanced with generous line spacing in body copy to maintain readability.",
     },
     palette: [
-      { name: "Burgundy", hex: "#7B1E24", rgb: "123,30,36", hsl: "356,61%,30%" },
-      { name: "Gold", hex: "#C59A3C", rgb: "197,154,60", hsl: "42,55%,50%" },
-      { name: "Cream", hex: "#F7EFE5", rgb: "247,239,229", hsl: "33,56%,93%" },
-      { name: "Ink", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" }
+      {
+        name: "Burgundy",
+        hex: "#7B1E24",
+        rgb: "123,30,36",
+        hsl: "356,61%,30%",
+        rgba: "123,30,36,1",
+      },
+      {
+        name: "Gold",
+        hex: "#C59A3C",
+        rgb: "197,154,60",
+        hsl: "42,55%,50%",
+        rgba: "197,154,60,1",
+      },
+      {
+        name: "Cream",
+        hex: "#F7EFE5",
+        rgb: "247,239,229",
+        hsl: "33,56%,93%",
+        rgba: "247,239,229,1",
+      },
+      {
+        name: "Ink",
+        hex: "#0B0B0B",
+        rgb: "11,11,11",
+        hsl: "0,0%,4%",
+        rgba: "11,11,11,1",
+      },
     ],
     process: [
-      { label: "Brand Positioning", date: "2023-07-20", note: "Defined modern-meets-heritage positioning and target audience." },
-      { label: "Icon Sketches", date: "2023-07-24", note: "Iterated madeline forms; tested for silhouette clarity." },
-      { label: "Vector Mark", date: "2023-07-27", note: "Refined curves, avoided tangents, established clear space." },
-      { label: "Collateral System", date: "2023-07-30", note: "Letterhead, envelope, and cards on a shared grid." },
-      { label: "Print Package", date: "2023-08-03", note: "CMYK profiles, bleeds, and paper recommendations included." }
+      {
+        label: "Brand Positioning",
+        note: "Defined modern-meets-heritage positioning and target audience.",
+      },
+      {
+        label: "Icon Sketches",
+        note: "Iterated madeline forms; tested for silhouette clarity.",
+      },
+      {
+        label: "Vector Mark",
+        note: "Refined curves, avoided tangents, established clear space.",
+      },
+      {
+        label: "Collateral System",
+        note: "Letterhead, envelope, and cards on a shared grid.",
+      },
+      {
+        label: "Print Package",
+        note: "CMYK profiles, bleeds, and paper recommendations included.",
+      },
     ],
     details: {
       tools:
@@ -500,8 +786,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "Clear usage specs and file variants were delivered for emboss, foil, and standard print. Documentation notes how to maintain contrast on different substrates.",
       craftsmanship:
-        "Curves are tangent-clean, with consistent stroke logic. Mockups match real print scale, ensuring logo legibility and ink density are predictable."
-    }
+        "Curves are tangent-clean, with consistent stroke logic. Mockups match real print scale, ensuring logo legibility and ink density are predictable.",
+    },
   },
 
   "sopamanxx-thumbnail": {
@@ -515,31 +801,69 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Black opacity layer behind title for legibility (crit-driven).",
       "Mobile legibility checked at small sizes.",
-      "Layer structure organized for fast reuse."
+      "Layer structure organized for fast reuse.",
     ],
     cover: "/images/work/sopamanxx/cover.png",
     coverPosition: "cover",
-    date: "2024-01",
     year: 2024,
     typography: {
       family: "Bebas Neue",
       weights: ["400"],
       sources: ["Google Fonts"],
       notes:
-        "A condensed display face with generous caps that remains legible at tiny sizes. Slightly increased tracking and a black plate ensure counters hold up against busy renders."
+        "A condensed display face with generous caps that remains legible at tiny sizes. Slightly increased tracking and a black plate ensure counters hold up against busy renders.",
     },
     palette: [
-      { name: "Plate Black", hex: "#000000", rgb: "0,0,0", hsl: "0,0%,0%" },
-      { name: "Highlight White", hex: "#FFFFFF", rgb: "255,255,255", hsl: "0,0%,100%" },
-      { name: "Accent Amber", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" },
-      { name: "Feed Gray", hex: "#222222", rgb: "34,34,34", hsl: "0,0%,13%" }
+      {
+        name: "Plate Black",
+        hex: "#000000",
+        rgb: "0,0,0",
+        hsl: "0,0%,0%",
+        rgba: "0,0,0,1",
+      },
+      {
+        name: "Highlight White",
+        hex: "#FFFFFF",
+        rgb: "255,255,255",
+        hsl: "0,0%,100%",
+        rgba: "255,255,255,1",
+      },
+      {
+        name: "Accent Amber",
+        hex: "#E2A028",
+        rgb: "226,160,40",
+        hsl: "40,76%,52%",
+        rgba: "226,160,40,1",
+      },
+      {
+        name: "Feed Gray",
+        hex: "#222222",
+        rgb: "34,34,34",
+        hsl: "0,0%,13%",
+        rgba: "34,34,34,1",
+      },
     ],
     process: [
-      { label: "Brief & Hook", date: "2023-12-28", note: "Clarified content hook and title length for mobile." },
-      { label: "Layout Axis", date: "2023-12-30", note: "Established diagonal flow for energy and hierarchy." },
-      { label: "Lighting Pass", date: "2024-01-02", note: "Painted rim lights and glow accents to separate subject from background." },
-      { label: "Title Plate", date: "2024-01-03", note: "Introduced black plate and tuned spacing for small-screen legibility." },
-      { label: "Export & QA", date: "2024-01-04", note: "Checked 25–35% scaled mocks to simulate phone feed." }
+      {
+        label: "Brief & Hook",
+        note: "Clarified content hook and title length for mobile.",
+      },
+      {
+        label: "Layout Axis",
+        note: "Established diagonal flow for energy and hierarchy.",
+      },
+      {
+        label: "Lighting Pass",
+        note: "Painted rim lights and glow accents to separate subject from background.",
+      },
+      {
+        label: "Title Plate",
+        note: "Introduced black plate and tuned spacing for small-screen legibility.",
+      },
+      {
+        label: "Export & QA",
+        note: "Checked 25–35% scaled mocks to simulate phone feed.",
+      },
     ],
     details: {
       tools:
@@ -553,8 +877,8 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "Template notes specify minimum title size and safe margins. Export settings are included to align with YouTube’s compression behavior.",
       craftsmanship:
-        "Layer naming and color coding make future iterations fast. The sharpen-last workflow prevents halos, and subtle noise keeps gradients smooth."
-    }
+        "Layer naming and color coding make future iterations fast. The sharpen-last workflow prevents halos, and subtle noise keeps gradients smooth.",
+    },
   },
 
   "depresso-espresso-poster": {
@@ -568,31 +892,69 @@ export const WORK_META: Record<string, WorkMeta> = {
     highlights: [
       "Cup sizes/opacity adjusted for balance (crit-driven).",
       "Faces blend with tone for depth; whitespace optimized.",
-      "Print-ready: embedded fonts/outline-safe vectors."
+      "Print-ready: embedded fonts/outline-safe vectors.",
     ],
     cover: "/images/work/depresso/cover.png",
     coverPosition: "contain",
-    date: "2023-07",
     year: 2023,
     typography: {
       family: "Cooper Black",
       weights: ["700"],
       sources: ["Local @font-face"],
       notes:
-        "A friendly, heavy serif suits the comedic tone and anchors the composition. Title scale is disciplined to avoid crowding expressive graphics; subcopy uses lighter tracking to prevent blockiness."
+        "A friendly, heavy serif suits the comedic tone and anchors the composition. Title scale is disciplined to avoid crowding expressive graphics; subcopy uses lighter tracking to prevent blockiness.",
     },
     palette: [
-      { name: "Coffee", hex: "#3B2F2F", rgb: "59,47,47", hsl: "0,12%,21%" },
-      { name: "Cream", hex: "#F1E3C6", rgb: "241,227,198", hsl: "38,58%,86%" },
-      { name: "Ink", hex: "#0B0B0B", rgb: "11,11,11", hsl: "0,0%,4%" },
-      { name: "Warm Accent", hex: "#E2A028", rgb: "226,160,40", hsl: "40,76%,52%" }
+      {
+        name: "Coffee",
+        hex: "#3B2F2F",
+        rgb: "59,47,47",
+        hsl: "0,12%,21%",
+        rgba: "59,47,47,1",
+      },
+      {
+        name: "Cream",
+        hex: "#F1E3C6",
+        rgb: "241,227,198",
+        hsl: "38,58%,86%",
+        rgba: "241,227,198,1",
+      },
+      {
+        name: "Ink",
+        hex: "#0B0B0B",
+        rgb: "11,11,11",
+        hsl: "0,0%,4%",
+        rgba: "11,11,11,1",
+      },
+      {
+        name: "Warm Accent",
+        hex: "#E2A028",
+        rgb: "226,160,40",
+        hsl: "40,76%,52%",
+        rgba: "226,160,40,1",
+      },
     ],
     process: [
-      { label: "Concept & Wordplay", date: "2023-06-15", note: "Sketched visual puns; chose expressive character angle." },
-      { label: "Vector Pass", date: "2023-06-18", note: "Constructed cups and faces with consistent stroke logic." },
-      { label: "Type & Rhythm", date: "2023-06-20", note: "Balanced title scale with whitespace to create pacing." },
-      { label: "Texture & Print Prep", date: "2023-06-22", note: "Applied subtle 300-dpi texture and set bleed/margins." },
-      { label: "Proof & Final", date: "2023-06-25", note: "Color-checked on coated/uncoated; exported press-ready." }
+      {
+        label: "Concept & Wordplay",
+        note: "Sketched visual puns; chose expressive character angle.",
+      },
+      {
+        label: "Vector Pass",
+        note: "Constructed cups and faces with consistent stroke logic.",
+      },
+      {
+        label: "Type & Rhythm",
+        note: "Balanced title scale with whitespace to create pacing.",
+      },
+      {
+        label: "Texture & Print Prep",
+        note: "Applied subtle 300-dpi texture and set bleed/margins.",
+      },
+      {
+        label: "Proof & Final",
+        note: "Color-checked on coated/uncoated; exported press-ready.",
+      },
     ],
     details: {
       tools:
@@ -606,7 +968,48 @@ export const WORK_META: Record<string, WorkMeta> = {
       directions:
         "Deliverables include social crops and a print-ready PDF/X-1a. Documentation notes how to convert the file for screen-only usage with lighter grain.",
       craftsmanship:
-        "All curves are tangent-clean and corner alignment is precise. Texture frequency avoids moiré; typography retains clarity at print sizes."
+        "All curves are tangent-clean and corner alignment is precise. Texture frequency avoids moiré; typography retains clarity at print sizes.",
+    },
+  },
+};
+
+/* -----------------------------------------------------------------------------
+   Enrichment (static, Hostinger-safe)
+   - Palette: from HEX → rgb/rgba/hsl + generated human-ish name (if missing)
+   - Typography: if `url` provided and family/weights missing → parse from URL
+   - Back-compat: mirror `process` → `timeline` if `timeline` absent
+----------------------------------------------------------------------------- */
+
+function enrichPalette(p?: PaletteColor[]): PaletteColor[] | undefined {
+  if (!p) return p;
+  return p.map((entry) => {
+    const hex = entry.hex;
+    const rgbArr = hexToRgb(hex) ?? [0, 0, 0];
+    const rgb = entry.rgb ?? rgbToString(rgbArr);
+    const rgba = entry.rgba ?? rgbaString(rgbArr, 1);
+    const hsl = entry.hsl ?? rgbToHslString(rgbArr);
+    const name = entry.name ?? descriptiveNameFromHex(hex);
+    return { ...entry, name, rgb, rgba, hsl };
+  });
+}
+
+function enrichTypography(t?: TypographyMeta): TypographyMeta | undefined {
+  if (!t) return t;
+  const out: TypographyMeta = { ...t };
+  if (t.url && (!t.family || !t.weights?.length)) {
+    const parsed = parseGoogleFontsHref(t.url);
+    if (parsed) {
+      out.family = out.family ?? parsed.family;
+      out.weights = out.weights?.length ? out.weights : parsed.weights;
+      out.sources = out.sources?.length ? out.sources : ["Google Fonts"];
     }
   }
-};
+  return out;
+}
+
+for (const slug of Object.keys(WORK_META)) {
+  const m = WORK_META[slug];
+  if (m.palette) m.palette = enrichPalette(m.palette);
+  if (m.typography) m.typography = enrichTypography(m.typography);
+  if (!m.timeline && m.process) m.timeline = m.process; // alias for older readers
+}

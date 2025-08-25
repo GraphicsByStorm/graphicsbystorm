@@ -1,13 +1,104 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import Header from '$components/Header.astro';
-import ContactSection from '$components/sections/ContactSection.astro';
-import SectionHeader from '$components/SectionHeader.astro';
+import BaseLayout from "$layouts/BaseLayout.astro";
+import ContactForm from "$svelte/components/ContactForm.svelte";
+export const prerender = true;
+
+// Replace with your endpoint
+const endpoint = "https://formspree.io/f/your-id";
+
+// Optional: simple hero with your filmstrip tone
+const hero = {
+  title: "Let’s work together",
+  blurb:
+    "Have a brief, an idea, or just a spark? Send a note and I’ll follow up with next steps.",
+  cover: "/images/hero/contact-cover.jpg", // optional; add an image or leave empty
+  coverPosition: "cover" as "top" | "contain" | "cover",
+};
 ---
-<BaseLayout title="Contact — GraphicsByStorm">
-  <Header />
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <SectionHeader label="Contact" href="/#contact" />
-    <ContactSection />
+
+<BaseLayout
+  title="Contact • Graphics by Storm"
+  description="Start a project with Graphics by Storm."
+>
+  <header class="hero-bleed">
+    <article
+      class="group relative isolate w-[100vw] overflow-hidden border-b border-white/10 bg-black/30"
+    >
+      {
+        hero.cover && (
+          <img
+            src={hero.cover}
+            alt=""
+            class="absolute inset-0 h-full w-full"
+            style={
+              hero.coverPosition === "top"
+                ? "object-fit:cover;object-position:top center;"
+                : hero.coverPosition === "contain"
+                  ? "object-fit:contain;background:#0e0e0e;"
+                  : "object-fit:cover;object-position:center;"
+            }
+          />
+        )
+      }
+      <div class="veil"></div>
+      <div class="hero-row">
+        <div class="tick"></div>
+        <div class="min-w-0 flex-1">
+          <h1 class="title">{hero.title}</h1>
+          <p class="lead">{hero.blurb}</p>
+        </div>
+      </div>
+    </article>
+  </header>
+
+  <main class="py-8">
+    <ContactForm
+      client:load
+      endpoint={endpoint}
+      leftRail="96px"
+      heading="Start a project"
+      blurb="Tell me about your project and I’ll reply within 1–2 business days."
+    />
   </main>
 </BaseLayout>
+
+<style>
+  .hero-bleed {
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    width: 100vw;
+  }
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+  }
+  .hero-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 320px;
+    padding-left: calc(96px + 1rem);
+    padding-right: 1rem;
+  }
+  .tick {
+    width: 6px;
+    height: 12px;
+    background: var(--color-brand-500, #e2a028);
+  }
+  .title {
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  }
+  .lead {
+    color: #cbd1d6;
+    margin: 0.35rem 0 0.9rem;
+    max-width: 70ch;
+    line-height: 1.55;
+  }
+</style>

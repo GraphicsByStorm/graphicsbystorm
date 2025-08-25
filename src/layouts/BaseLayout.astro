@@ -1,31 +1,32 @@
 ---
-interface Props {
+export interface Props {
   title?: string;
   description?: string;
 }
-const { title = "GraphicsByStorm", description = "Design that sells." } = Astro.props;
 
+const { title = "Graphics by Storm", description = "" } = Astro.props;
+
+// Build canonical without request headers.
+// Works in SSG because Astro.url is available at build time when prerendering.
+const origin = Astro.site ?? new URL("/", "https://graphicsbystorm.com");
+const canonical = new URL(Astro.url.pathname, origin).toString();
 import "$styles/tailwind.css";
 import "$styles/theme.css";
-import SocialNav from '$svelte/components/SocialNav.svelte';
-import BackgroundFX from "$components/BackgroundFX.astro";
 import Header from "$components/Header.astro";
 ---
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="icon" href="/favicon.svg" />
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.ico" />
   </head>
-  <body class="min-h-dvh bg-neutral-950 text-neutral-100 antialiased">
+  <body class="bg-[var(--surface-0,#0a0a0a)] text-white">
     <Header />
-    <BackgroundFX />
-    <main>
-      <SocialNav client:load />
-      <slot />
-    </main>
+    <slot />
   </body>
 </html>

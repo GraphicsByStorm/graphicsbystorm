@@ -1,13 +1,18 @@
 ---
 /* Neutral grid + high-res fine noise via mask; uses --noise-size */
 ---
-<div class="pointer-events-none fixed inset-0 -z-50 bg-neutral-950 bg-grid"></div>
 
-<div class="pointer-events-none fixed inset-0 -z-40"
-     style="
+<div class="pointer-events-none fixed inset-0 -z-50 bg-neutral-950 bg-grid">
+</div>
+
+<div
+  class="pointer-events-none fixed inset-0 -z-40"
+  style="
       background-color: rgba(255,255,255,0.04);
       -webkit-mask-image: var(--noise-mask);
               mask-image: var(--noise-mask);
       -webkit-mask-size: var(--noise-size);
               mask-size: var(--noise-size);
-     "></div>
+     "
+>
+</div>

@@ -1,13 +1,87 @@
 ---
-import BaseLayout from '$layouts/BaseLayout.astro';
-import Header from '$components/Header.astro';
-import FAQSection from '$components/sections/FAQSection.astro';
-import SectionHeader from '$components/SectionHeader.astro';
+import BaseLayout from "$layouts/BaseLayout.astro";
+export const prerender = true;
+
+type QA = { q: string; a: string | string[]; };
+const leftRail = "96px";
+
+const FAQ: QA[] = [
+  {
+    q: "What services do you offer?",
+    a: ["Branding & identity", "Social kits & stream overlays", "Promo graphics & posters", "Guides & docs"],
+  },
+  {
+    q: "How do you price projects?",
+    a: "Fixed-scope pricing for common packages; custom quotes for unique needs. You’ll always see deliverables, timeline, and rounds before we begin.",
+  },
+  {
+    q: "What do I receive at handoff?",
+    a: ["Editable sources", "Exports in required sizes", "Usage notes", "Light guidance on updates"],
+  },
+  {
+    q: "What’s the typical timeline?",
+    a: "Small kits can take a few days; larger identity work runs a couple weeks depending on feedback cadence.",
+  },
+];
 ---
-<BaseLayout title="FAQ — GraphicsByStorm">
-  <Header />
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <SectionHeader label="FAQ" href="/#faq" />
-    <FAQSection />
-  </main>
+
+<BaseLayout title="FAQ • Graphics by Storm">
+  <section class="mx-auto max-w-6xl px-4 pt-12 sm:pt-14 lg:pt-16">
+    <h1 class="mb-4 text-[clamp(1.35rem,2.2vw,1.75rem)] font-extrabold tracking-tight">
+      <span class="mr-2 inline-block h-3 w-1.5 translate-y-[2px]" style="background: var(--color-brand-500,#E2A028);"></span>
+      Frequently Asked Questions
+    </h1>
+  </section>
+
+  <div class="faq-bleed" style={`--left-rail:${leftRail};`}>
+    {FAQ.map((item, i) => (
+      <article class="group relative isolate w-[100vw] overflow-hidden border-b border-white/10 bg-black/30">
+        <div class="row">
+          <div class="mr-2 inline-block h-3 w-1.5" style="background: var(--color-brand-500,#E2A028);"></div>
+
+          <div class="min-w-0 flex-1">
+            <h2 class="truncate text-[13px] sm:text-[14px] font-extrabold tracking-tight text-white">{item.q}</h2>
+
+            <!-- answer -->
+            <div class="answer mt-2">
+              {Array.isArray(item.a)
+                ? <ul class="list-disc pl-5 text-[12px] text-white/85 space-y-0.5">{item.a.map((b) => <li>{b}</li>)}</ul>
+                : <p class="text-[12px] text-white/85">{item.a}</p>}
+            </div>
+          </div>
+
+          <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[var(--color-brand-500,#E2A028)] underline underline-offset-4 decoration-[var(--color-brand-500,#E2A028)] opacity-0 translate-x-1 transition duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-0">
+            Reveal →
+          </div>
+        </div>
+
+        <!-- Make the whole strip focusable (keyboard = reveal) -->
+        <a class="hit absolute inset-0 outline-none" href={`#faq-${i}`} aria-label={`Reveal answer ${i+1}`}></a>
+      </article>
+    ))}
+  </div>
 </BaseLayout>
+
+<style>
+  .faq-bleed {
+    position: relative;
+    left: 50%; right: 50%;
+    margin-left: -50vw; margin-right: -50vw;
+    width: 100vw;
+  }
+  .row {
+    padding-left: calc(var(--left-rail, 96px) + 1rem);
+    padding-right: 1rem;
+    height: 140px;
+    display: flex; align-items: center;
+    transition: height .25s ease;
+  }
+  .group:hover .row, .group:focus-within .row { height: 300px; }
+
+  /* Answers hidden by default; show on hover or focus-within */
+  .answer {
+    max-height: 0; opacity: 0; overflow: hidden;
+    transition: max-height .28s ease, opacity .22s ease;
+  }
+  .group:hover .answer, .group:focus-within .answer { max-height: 320px; opacity: 1; }
+</style>

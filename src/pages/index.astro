@@ -11,13 +11,12 @@ import ContactSection from "$compSec/ContactSection.astro";
 
 // Svelte “islands”
 import WorkSection from "$svelteSec/WorkSection.svelte";
-import ShopSection from "$svelteSec/ShopSection.svelte";
 
 // Data
 import { WORKS } from "$lib/data/work";
-import { WORK_META } from '$lib/data/workMeta';
+import { WORK_META } from "$lib/data/workMeta";
 
-const items = WORKS.map(w => ({ ...w, ...WORK_META[w.slug] }));
+const items = WORKS.map((w) => ({ ...w, ...WORK_META[w.slug] }));
 ---
 
 <BaseLayout title="GraphicsByStorm">
@@ -29,6 +28,5 @@ const items = WORKS.map(w => ({ ...w, ...WORK_META[w.slug] }));
   <AboutSection />
   <ServicesSection />
   <FAQSection />
-  <ShopSection client:visible />
   <ContactSection />
 </BaseLayout>
